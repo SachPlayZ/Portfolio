@@ -3,19 +3,127 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --primary: 255, 0, 255;
+  --secondary: 138, 43, 226;
+  --background: 10, 10, 10;
+  --foreground: 230, 230, 230;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    @apply bg-black text-gray-200;
+    background-image: radial-gradient(
+      circle at 50% 50%,
+      rgba(var(--secondary), 0.08),
+      transparent 1200px
+    );
+    background-attachment: fixed;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-black;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-purple-900 rounded-full;
+  }
+
+  ::selection {
+    @apply bg-purple-700 text-white;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .glass-card {
+    @apply bg-black/40 backdrop-blur-md border border-gray-800 rounded-xl shadow-lg;
+  }
+
+  .glass-nav {
+    @apply bg-black/60 backdrop-blur-md border-b border-gray-800;
+  }
+
+  .glow-text {
+    text-shadow: 0 0 10px rgba(var(--primary), 0.5);
+  }
+
+  .glow-border {
+    box-shadow: 0 0 15px rgba(var(--primary), 0.3);
+  }
+
+  .gradient-text {
+    @apply text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-fuchsia-500;
+  }
+}
+
+.parallax-container {
+  perspective: 1000px;
+}
+
+.parallax-element {
+  transform-style: preserve-3d;
+}
+
+/* Cyberpunk grid animation */
+.grid-animation {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.h-line {
+  position: absolute;
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(138, 43, 226, 0),
+    rgba(138, 43, 226, 0.5),
+    rgba(138, 43, 226, 0)
+  );
+  animation: grid-pulse 3s linear infinite;
+}
+
+.v-line {
+  position: absolute;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(138, 43, 226, 0),
+    rgba(138, 43, 226, 0.5),
+    rgba(138, 43, 226, 0)
+  );
+  animation: grid-pulse 3s linear infinite;
+}
+
+@keyframes grid-pulse {
+  0% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0.2;
+  }
+}
+
+.neon-light {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(138, 43, 226, 0.7) 0%,
+    rgba(138, 43, 226, 0.3) 40%,
+    transparent 70%
+  );
+  filter: blur(20px);
 }
