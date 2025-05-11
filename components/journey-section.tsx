@@ -6,31 +6,65 @@ import { Trophy, Calendar, Award, Users } from "lucide-react";
 
 const journeyItems = [
   {
-    title: "CoinDCX Unfold Hackathon",
-    date: "August 2023",
+    title: "Web3 Track Winner - Status Code 1",
+    date: "August 2024",
     description:
-      "Won first place with VeilX, a privacy-focused decentralized exchange.",
+      "Won the Web3 track at Status Code 1 hackathon with 4000+ participants, hosted by IIIT Kalyani.",
     icon: <Trophy className="w-6 h-6 text-yellow-400" />,
   },
   {
-    title: "Open Campus Hackathon",
-    date: "March 2023",
+    title: "Winner - HackHeritage",
+    date: "September 2024",
     description:
-      "Developed Orphic, a Web3 marketplace for digital collectibles.",
+      "Won HackHeritage hackathon with 1000+ participants, hosted by Heritage Institute of Technology.",
+    icon: <Trophy className="w-6 h-6 text-yellow-400" />,
+  },
+  {
+    title: "International Freelancing",
+    date: "November 2024",
+    description:
+      "Started freelancing for international clients, delivering Web3 and blockchain solutions.",
+    icon: <Users className="w-6 h-6 text-blue-400" />,
+  },
+  {
+    title: "1st Prize - Unfold24",
+    date: "December 2024",
+    description:
+      "Won 1st Prize Track at Bullieverse in Unfold24 with 8000+ participants, hosted by CoinDCX.",
+    icon: <Trophy className="w-6 h-6 text-yellow-400" />,
+  },
+  {
+    title: "DevRel at Quill AI Network",
+    date: "January 2025",
+    description: "Joined Quill AI Network as a Developer Relations Engineer.",
+    icon: <Users className="w-6 h-6 text-blue-400" />,
+  },
+  {
+    title: "NFT Infra Track Winner - EDU Chain",
+    date: "January 2025",
+    description:
+      "Won NFT Infrastructure Track at EDU Chain Semester 2 Hackathon with 2500+ participants, hosted by Open Campus.",
     icon: <Award className="w-6 h-6 text-purple-400" />,
   },
   {
-    title: "HackHeritage",
-    date: "November 2022",
+    title: "Software Engineer at Alchemyst AI",
+    date: "March 2025",
+    description: "Joined Alchemyst AI as a Software Engineer.",
+    icon: <Users className="w-6 h-6 text-blue-400" />,
+  },
+  {
+    title: "1st Prize - EDU Chain Regional",
+    date: "March 2025",
     description:
-      "Created Ruins of Rome, an immersive blockchain-based strategy game.",
+      "Won 1st Prize at EDU Chain Regional Hackathon, Kolkata hosted by HackQuest.",
     icon: <Trophy className="w-6 h-6 text-yellow-400" />,
   },
   {
-    title: "GDG Web3 Mentor",
-    date: "2022 - Present",
-    description: "Mentoring aspiring Web3 developers and conducting workshops.",
-    icon: <Users className="w-6 h-6 text-blue-400" />,
+    title: "AI/ML Track Winner - Binary2K25",
+    date: "March 2025",
+    description:
+      "Won AI/ML Track Prize at Binary2K25 hosted by Kalyani Govt Engineering College.",
+    icon: <Award className="w-6 h-6 text-purple-400" />,
   },
 ];
 
@@ -96,7 +130,11 @@ export default function JourneySection() {
                     <h3 className="text-xl font-bold mb-1 text-white">
                       {item.title}
                     </h3>
-                    <div className="flex items-center gap-2 text-gray-400 mb-3 text-sm">
+                    <div
+                      className={`flex items-center gap-2 text-gray-400 mb-3 text-sm ${
+                        index % 2 === 0 ? "justify-start" : "justify-end"
+                      }`}
+                    >
                       <Calendar size={14} />
                       <span>{item.date}</span>
                     </div>
