@@ -69,7 +69,7 @@ export default function SkillsSection() {
             My Skills
           </h2>
           <p className="text-gray-400 max-w-2xl mx-auto">
-            A comprehensive set of technologies I've mastered throughout my
+            A comprehensive set of technologies I&apos;ve mastered throughout my
             journey as a developer.
           </p>
         </motion.div>

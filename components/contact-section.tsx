@@ -161,7 +161,7 @@ export default function ContactSection() {
                 >
                   <p className="font-medium">Thank you for your message!</p>
                   <p className="text-sm text-gray-300 mt-1">
-                    I'll get back to you as soon as possible.
+                    I&apos;ll get back to you as soon as possible.
                   </p>
                 </motion.div>
               ) : null}
