@@ -16,6 +16,7 @@ const navItems = [
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState("home");
 
   const handleNavClick = (
     e: React.MouseEvent<HTMLAnchorElement>,
@@ -31,7 +32,26 @@ export default function Navbar() {
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
+
+      // Find which section is currently in view
+      const sections = navItems.map((item) => item.href.substring(1));
+      const currentSection = sections.find((section) => {
+        const element = document.getElementById(section);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          return (
+            rect.top <= window.innerHeight / 2 &&
+            rect.bottom >= window.innerHeight / 2
+          );
+        }
+        return false;
+      });
+
+      if (currentSection) {
+        setActiveSection(currentSection);
+      }
     };
+
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -47,24 +67,35 @@ export default function Navbar() {
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      {navItems.map((item) => (
-        <motion.div
-          key={item.name}
-          className="group relative flex items-center justify-center"
-          whileHover={{ scale: 1.1 }}
-        >
-          <Link
-            href={item.href}
-            onClick={(e) => handleNavClick(e, item.href)}
-            className="flex items-center justify-center p-2 text-gray-300 hover:text-purple-400 transition-colors duration-300"
+      {navItems.map((item) => {
+        const isActive = activeSection === item.href.substring(1);
+        return (
+          <motion.div
+            key={item.name}
+            className="group relative flex items-center justify-center"
+            whileHover={{ scale: 1.1 }}
           >
-            <item.icon size={20} />
-            <span className="absolute right-full mr-2 bg-black/80 px-2 py-1 rounded text-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              {item.name}
-            </span>
-          </Link>
-        </motion.div>
-      ))}
+            <Link
+              href={item.href}
+              onClick={(e) => handleNavClick(e, item.href)}
+              className={`flex items-center justify-center p-2 transition-colors duration-300 ${
+                isActive
+                  ? "text-purple-400"
+                  : "text-gray-300 hover:text-purple-400"
+              }`}
+            >
+              <item.icon size={20} />
+              <span
+                className={`absolute right-full mr-2 bg-black/80 px-2 py-1 rounded text-sm whitespace-nowrap transition-opacity duration-300 ${
+                  isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                }`}
+              >
+                {item.name}
+              </span>
+            </Link>
+          </motion.div>
+        );
+      })}
     </motion.nav>
   );
 }
