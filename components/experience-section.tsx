@@ -8,21 +8,21 @@ import { Calendar, MapPin } from "lucide-react";
 const experiences = [
   {
     company: "Alchemyst AI",
-    position: "Senior Web3 Developer",
-    period: "Jan 2023 - Present",
+    position: "Software Engineer",
+    period: "March 2025 - May 2025",
     location: "Remote",
     description:
-      "Leading the development of decentralized applications and smart contracts. Implementing advanced blockchain solutions and integrating AI capabilities with Web3 technologies.",
-    logo: "/placeholder.svg?height=100&width=100",
+      "• Architected DeepResearch UI from the ground up, enabling users to dissect LLM thought processes with interactive visualizations and real-time code execution for stock analysis, enhancing user engagement by 40%.\n• Worked on building the transcripts feature that allows customers to view the conversations happening in their campaigns through the AI SDR.\n• Working on integrating GenAI pipelines into the frontend interface for seamless interactions with our AI employees.",
+    logo: "/alchemyst-ai.jpeg",
   },
   {
     company: "QuillAI",
-    position: "Full Stack Developer",
-    period: "Mar 2021 - Dec 2022",
+    position: "Dev Rel Engineer",
+    period: "Dec 2024 - Feb 2025",
     location: "Remote",
     description:
-      "Developed and maintained full-stack applications using React, Node.js, and MongoDB. Implemented responsive UI designs and RESTful APIs for various client projects.",
-    logo: "/placeholder.svg?height=100&width=100",
+      "• Fostered healthy partnerships with 40+ universities across India and onboarded more than 2000 unique users to our product QuillShield.\n• Working on the website and API behind the points program for the Ambassador program of QuillAI.\n• Building the AVS for consensus verified AI Agents on EigenLayer for DeFAI Agents.",
+    logo: "/quillai.webp",
   },
 ];
 
