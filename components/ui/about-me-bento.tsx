@@ -9,6 +9,8 @@ import {
 import GitHubActivity from "./github-activity";
 import TechStackScroll from "./tech-stack-scroll";
 import SpotifyNowPlaying from "./spotify-now-playing";
+import SpotifyTitle from "./spotify-title";
+import SpotifyArtist from "./spotify-artist";
 
 const Skeleton = () => (
   <div className="flex flex-1 w-full h-full min-h-[6rem] rounded-xl dark:bg-dot-white/[0.2] bg-dot-black/[0.2] [mask-image:radial-gradient(ellipse_at_center,white,transparent)] border border-transparent dark:border-white/[0.2] bg-neutral-100 dark:bg-black"></div>
@@ -39,11 +41,10 @@ export default function AboutMeBento() {
 
           {/* Spotify Activity */}
           <BentoGridItem
-            title="Currently Playing"
-            description="My latest musical inspiration while coding"
+            title={<SpotifyTitle />}
+            description={<SpotifyArtist />}
             header={<SpotifyNowPlaying />}
             className="md:col-span-1"
-            icon={<IconBrandSpotify className="h-4 w-4 text-neutral-500" />}
           />
 
           {/* Featured Projects */}

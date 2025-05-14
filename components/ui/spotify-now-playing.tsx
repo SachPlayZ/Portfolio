@@ -3,11 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import {
-  IconBrandSpotify,
-  IconPlayerPlay,
-  IconPlayerPause,
-} from "@tabler/icons-react";
+import { IconBrandSpotify } from "@tabler/icons-react";
 
 interface SpotifyData {
   isPlaying: boolean;
@@ -59,47 +55,21 @@ export default function SpotifyNowPlaying() {
   }
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center p-4 relative group">
+    <div className="w-full h-full relative">
       {data.albumArt ? (
-        <div className="relative w-32 h-32 rounded-lg overflow-hidden mb-4">
-          <Image
-            src={data.albumArt}
-            alt={data.album}
-            fill
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-            {data.isPlaying ? (
-              <IconPlayerPause className="w-10 h-10 text-white" />
-            ) : (
-              <IconPlayerPlay className="w-10 h-10 text-white" />
-            )}
-          </div>
-        </div>
+        <Image
+          src={data.albumArt}
+          alt={data.album}
+          fill
+          className="object-cover rounded-t-xl"
+        />
       ) : (
-        <div className="w-32 h-32 rounded-lg bg-black/40 flex items-center justify-center mb-4">
+        <div className="w-full h-full bg-black/40 flex items-center justify-center rounded-t-xl">
           <IconBrandSpotify className="w-12 h-12 text-green-500" />
         </div>
       )}
-
-      <div className="text-center">
-        <a
-          href={data.songUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hover:text-purple-400 transition-colors"
-        >
-          <h4 className="font-medium text-sm mb-1 truncate max-w-[200px]">
-            {data.title}
-          </h4>
-        </a>
-        <p className="text-xs text-gray-400 truncate max-w-[200px]">
-          {data.artist}
-        </p>
-      </div>
-
-      <div className="absolute bottom-2 right-2">
-        <IconBrandSpotify className="w-5 h-5 text-green-500" />
+      <div className="absolute top-2 right-2 bg-black/60 p-1.5 rounded-full">
+        <IconBrandSpotify className="w-4 h-4 text-green-500" />
       </div>
     </div>
   );
