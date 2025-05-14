@@ -14,13 +14,13 @@ export default function Home() {
         <AboutMeBento />
       </AnimatedSection>
       <AnimatedSection>
+        <ExperienceSection />
+      </AnimatedSection>
+      <AnimatedSection>
         <ProjectsSection />
       </AnimatedSection>
       <AnimatedSection>
         <JourneySection />
-      </AnimatedSection>
-      <AnimatedSection>
-        <ExperienceSection />
       </AnimatedSection>
       <AnimatedSection>
         <ContactSection />
