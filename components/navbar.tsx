@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Home, Code, Briefcase, BookOpen, Award, Mail } from "lucide-react";
+import { Home, User, Briefcase, BookOpen, Award, Mail } from "lucide-react";
 
 const navItems = [
   { name: "Home", href: "#home", icon: Home },
-  { name: "Skills", href: "#skills", icon: Code },
+  { name: "About", href: "#about", icon: User },
   { name: "Projects", href: "#projects", icon: Briefcase },
   { name: "Journey", href: "#journey", icon: BookOpen },
   { name: "Experience", href: "#experience", icon: Award },

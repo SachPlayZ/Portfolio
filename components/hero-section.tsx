@@ -3,6 +3,8 @@
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowDown } from "lucide-react";
+import ShinyText from "@/src/blocks/TextAnimations/ShinyText/ShinyText";
+import ProfilePictureWithCircularText from "./ProfilePictureWithCircularText";
 
 const CyberpunkGrid = () => {
   return (
@@ -170,13 +172,32 @@ export default function HeroSection() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8, duration: 0.8 }}
             >
-              <a
+              <motion.a
                 href="#skills"
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white px-8 py-3 rounded-full font-medium hover:from-purple-700 hover:to-fuchsia-700 transition-all duration-300 shadow-lg hover:shadow-purple-500/25"
+                className="inline-block cursor-pointer group relative"
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
-                Explore My Work
-                <ArrowDown size={18} />
-              </a>
+                <ShinyText
+                  text="Explore My Work"
+                  className="text-sm font-semibold text-purple-300"
+                  speed={3}
+                />
+                <motion.span
+                  className="inline-block ml-1 text-purple-400"
+                  animate={{
+                    y: [0, 2, 0],
+                  }}
+                  transition={{
+                    repeat: Infinity,
+                    duration: 1.5,
+                  }}
+                >
+                  ↓
+                </motion.span>
+                <span className="absolute bottom-0 left-0 w-full h-[1px] bg-purple-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
+              </motion.a>
             </motion.div>
           </motion.div>
 
@@ -187,23 +208,11 @@ export default function HeroSection() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.4, duration: 0.8 }}
           >
-            <div className="relative w-72 h-72 md:w-96 md:h-96">
-              {/* Glowing background effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-fuchsia-500/20 rounded-full blur-3xl animate-pulse" />
-
-              {/* Profile picture container */}
-              <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-purple-500/30 shadow-2xl shadow-purple-500/20">
-                <img
-                  src="/Portfolio.JPG"
-                  alt="Sachindra Kumar Singh"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-
-              {/* Decorative elements */}
-              <div className="absolute -top-4 -right-4 w-24 h-24 bg-purple-500/10 rounded-full blur-2xl" />
-              <div className="absolute -bottom-4 -left-4 w-24 h-24 bg-fuchsia-500/10 rounded-full blur-2xl" />
-            </div>
+            <ProfilePictureWithCircularText
+              imageSrc="/Portfolio.JPG"
+              imageAlt="Sachindra Kumar Singh"
+              circularText="FULL STACK DEVELOPER • WEB3 DEVELOPER • "
+            />
           </motion.div>
         </div>
       </div>
