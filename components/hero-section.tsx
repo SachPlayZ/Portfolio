@@ -173,7 +173,7 @@ export default function HeroSection() {
               transition={{ delay: 0.8, duration: 0.8 }}
             >
               <motion.a
-                href="#skills"
+                href="#about"
                 className="inline-block cursor-pointer group relative"
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
