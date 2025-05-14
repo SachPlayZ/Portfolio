@@ -4,7 +4,7 @@ import SpotifyWebApi from "spotify-web-api-node";
 const spotifyApi = new SpotifyWebApi({
   clientId: process.env.SPOTIFY_CLIENT_ID,
   clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-  redirectUri: "http://192.168.0.111:3000/api/spotify/callback",
+  redirectUri: "https://sachplayz.vercel.app/api/spotify/callback",
 });
 
 export async function GET(request: Request) {

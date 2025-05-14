@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import SpotifyWebApi from "spotify-web-api-node";
 
 // Make sure this exactly matches what's in your Spotify Dashboard
-const redirectUri = "http://192.168.0.111:3000/api/spotify/callback";
+const redirectUri = "https://sachplayz.vercel.app/api/spotify/callback";
 
 const spotifyApi = new SpotifyWebApi({
   clientId: process.env.SPOTIFY_CLIENT_ID,
