@@ -76,9 +76,9 @@ export default function TechStackScroll() {
                     stiffness: 300,
                   },
                 }}
-                className="flex items-center gap-3 bg-black/40 px-6 py-3 rounded-full hover:bg-black/50 transition-colors w-[calc(25%-18px)]"
+                className="flex items-center justify-center gap-2 sm:gap-3 bg-black/40 px-4 sm:px-6 py-2 sm:py-3 rounded-full hover:bg-black/50 transition-colors w-[calc(50%-8px)] sm:w-[calc(50%-12px)] md:w-[calc(33.33%-16px)] lg:w-[calc(25%-18px)]"
               >
-                <div className="relative w-8 h-8 flex-shrink-0">
+                <div className="relative w-6 h-6 sm:w-8 sm:h-8 flex-shrink-0">
                   <Image
                     src={skill.icon}
                     alt={skill.name}
@@ -86,7 +86,7 @@ export default function TechStackScroll() {
                     className="object-contain"
                   />
                 </div>
-                <span className="text-base text-gray-200 whitespace-nowrap font-medium">
+                <span className="text-sm sm:text-base text-gray-200 whitespace-nowrap font-medium">
                   {skill.name}
                 </span>
               </motion.div>

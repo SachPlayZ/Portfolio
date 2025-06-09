@@ -8,6 +8,7 @@ const projectSchema = new mongoose.Schema(
     technologies: [{ type: String }],
     githubUrl: { type: String },
     liveUrl: { type: String },
+    videoUrl: { type: String },
     featured: { type: Boolean, default: false },
     order: { type: Number, default: 0 },
   },

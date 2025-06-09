@@ -5,6 +5,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import NavigationWrapper from "@/components/navigation-wrapper";
 import Providers from "./providers";
+import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,6 +28,7 @@ export default function RootLayout({
             <NavigationWrapper>{children}</NavigationWrapper>
           </ThemeProvider>
         </Providers>
+        <Toaster />
       </body>
     </html>
   );

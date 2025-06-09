@@ -43,107 +43,86 @@ declare global {
 }
 
 interface Project {
+  _id: string;
   title: string;
   description: string;
-  videoId?: string;
-  loomId?: string;
-  image?: string;
-  tags: string[];
-  github: string;
-  demo: string;
+  videoUrl?: string;
+  images: string[];
+  technologies: string[];
+  githubUrl: string;
+  liveUrl: string;
+  featured: boolean;
+  order: number;
 }
 
-const projects: Project[] = [
-  {
-    title: "VeilX",
-    description:
-      "A decentralized privacy-focused platform built on Ethereum that enables secure and anonymous transactions.",
-    videoId: "hQACK3z_BC4", // Replace with actual YouTube video ID
-    tags: ["Solidity", "React", "Ethers.js", "Hardhat", "IPFS"],
-    github: "https://github.com/sachplayz",
-    demo: "#",
-  },
-  {
-    title: "Orphic",
-    description:
-      "A Web3 marketplace for digital collectibles with advanced features for creators and collectors.",
-    videoId: "uQeGOQMYuCI", // Replace with actual YouTube video ID
-    tags: ["Next.js", "TypeScript", "Solidity", "The Graph", "Tailwind CSS"],
-    github: "https://github.com/sachplayz",
-    demo: "#",
-  },
-  {
-    title: "Ruins of Rome",
-    description:
-      "An immersive blockchain-based strategy game with NFT integration and on-chain governance.",
-    loomId: "f06b93ac777f4dd083a130115987988f", // Replace with actual YouTube video ID
-    tags: ["Rust", "WebGL", "React", "Solana", "Three.js"],
-    github: "https://github.com/sachplayz",
-    demo: "#",
-  },
-];
-
 export default function ProjectsSection() {
+  const [projects, setProjects] = useState<Project[]>([]);
   const [activeProject, setActiveProject] = useState<number | null>(null);
   const [players, setPlayers] = useState<{ [key: string]: any }>({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await fetch("/api/projects");
+        const data = await response.json();
+        setProjects(data);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, []);
+
+  useEffect(() => {
+    if (projects.length === 0) return;
+
     // Load YouTube IFrame API
     const tag = document.createElement("script");
     tag.src = "https://www.youtube.com/iframe_api";
     const firstScriptTag = document.getElementsByTagName("script")[0];
     firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
 
-    // Initialize YouTube and Loom players when APIs are ready
+    // Initialize YouTube players when API is ready
     window.onYouTubeIframeAPIReady = () => {
       projects.forEach((project, index) => {
-        if (project.videoId) {
-          const player = new window.YT.Player(`youtube-player-${index}`, {
-            videoId: project.videoId,
-            playerVars: {
-              autoplay: 1,
-              controls: 0,
-              disablekb: 1,
-              enablejsapi: 1,
-              fs: 0,
-              loop: 1,
-              modestbranding: 1,
-              mute: 1,
-              playsinline: 1,
-              rel: 0,
-              start: 0,
-              end: 10,
-            },
-            events: {
-              onReady: (event: { target: any }) => {
-                event.target.playVideo();
+        if (project.videoUrl) {
+          const videoId =
+            project.videoUrl.split("v=")[1] ||
+            project.videoUrl.split("/").pop();
+          if (videoId) {
+            const player = new window.YT.Player(`youtube-player-${index}`, {
+              videoId: videoId,
+              playerVars: {
+                autoplay: 1,
+                controls: 0,
+                disablekb: 1,
+                enablejsapi: 1,
+                fs: 0,
+                loop: 1,
+                modestbranding: 1,
+                mute: 1,
+                playsinline: 1,
+                rel: 0,
+                start: 0,
+                end: 10,
               },
-              onStateChange: (event: { data: number; target: any }) => {
-                if (event.data === window.YT.PlayerState.ENDED) {
-                  event.target.seekTo(0);
+              events: {
+                onReady: (event: { target: any }) => {
                   event.target.playVideo();
-                }
+                },
+                onStateChange: (event: { data: number; target: any }) => {
+                  if (event.data === window.YT.PlayerState.ENDED) {
+                    event.target.seekTo(0);
+                    event.target.playVideo();
+                  }
+                },
               },
-            },
-          });
-          setPlayers((prev) => ({ ...prev, [`youtube-${index}`]: player }));
-        } else if (project.loomId) {
-          const iframe = document.getElementById(
-            `loom-player-${index}`
-          ) as HTMLIFrameElement;
-          if (iframe) {
-            iframe.src = `https://www.loom.com/embed/${project.loomId}?hide_owner=true&hide_share=true&hide_title=true&hideEmbedTopBar=true`;
-            iframe.onload = () => {
-              const player = {
-                playVideo: () => {
-                  iframe.contentWindow?.postMessage({ type: "play" }, "*");
-                },
-                pauseVideo: () => {
-                  iframe.contentWindow?.postMessage({ type: "pause" }, "*");
-                },
-              };
-              setPlayers((prev) => ({ ...prev, [`loom-${index}`]: player }));
-            };
+            });
+            setPlayers((prev) => ({ ...prev, [`youtube-${index}`]: player }));
           }
         }
       });
@@ -157,7 +136,19 @@ export default function ProjectsSection() {
         }
       });
     };
-  }, []);
+  }, [projects]);
+
+  if (loading) {
+    return (
+      <section id="projects" className="py-20 relative">
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500 mx-auto"></div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="projects" className="py-20 relative">
@@ -181,7 +172,7 @@ export default function ProjectsSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {projects.map((project, index) => (
             <motion.div
-              key={index}
+              key={project._id}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -191,21 +182,14 @@ export default function ProjectsSection() {
               onMouseLeave={() => setActiveProject(null)}
             >
               <div className="relative h-48 overflow-hidden">
-                {project.videoId ? (
+                {project.videoUrl ? (
                   <div
                     id={`youtube-player-${index}`}
                     className="w-full h-full"
                   />
-                ) : project.loomId ? (
-                  <iframe
-                    src={`https://www.loom.com/embed/${project.loomId}?autoplay=1&loop=1&hide_owner=true&hide_share=true&hide_title=true&hideEmbedTopBar=true&background_color=transparent&hide_controls=true`}
-                    frameBorder="0"
-                    allowFullScreen
-                    className="w-full h-full"
-                  />
                 ) : (
                   <Image
-                    src={project.image || "/placeholder.svg"}
+                    src={project.images[0] || "/placeholder.svg"}
                     alt={project.title}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
@@ -221,19 +205,19 @@ export default function ProjectsSection() {
                 <p className="text-gray-400 mb-4">{project.description}</p>
 
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {project.tags.map((tag, tagIndex) => (
+                  {project.technologies.map((tech, techIndex) => (
                     <span
-                      key={tagIndex}
+                      key={techIndex}
                       className="text-xs bg-purple-900/30 text-purple-300 px-2 py-1 rounded-full"
                     >
-                      {tag}
+                      {tech}
                     </span>
                   ))}
                 </div>
 
                 <div className="flex gap-4">
                   <Link
-                    href={project.github}
+                    href={project.githubUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-gray-400 hover:text-purple-400 transition-colors flex items-center gap-1"
@@ -242,7 +226,7 @@ export default function ProjectsSection() {
                     <span>Code</span>
                   </Link>
                   <Link
-                    href={project.demo}
+                    href={project.liveUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-gray-400 hover:text-purple-400 transition-colors flex items-center gap-1"

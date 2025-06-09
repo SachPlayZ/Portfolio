@@ -216,20 +216,6 @@ export default function HeroSection() {
           </motion.div>
         </div>
       </div>
-
-      <motion.div
-        className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
-        animate={{
-          y: [0, 10, 0],
-        }}
-        transition={{
-          repeat: Number.POSITIVE_INFINITY,
-          duration: 1.5,
-        }}
-        style={{ opacity }}
-      >
-        <ArrowDown className="text-purple-400" size={30} />
-      </motion.div>
     </section>
   );
 }

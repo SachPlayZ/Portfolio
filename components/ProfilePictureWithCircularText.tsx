@@ -36,7 +36,7 @@ const ProfilePictureWithCircularText: React.FC<
             text={circularText}
             spinDuration={20}
             onHover="slowDown"
-            className="!w-[300px] !h-[300px] md:!w-[450px] md:!h-[450px] text-purple-400"
+            className="!w-[350px] !h-[350px] md:!w-[450px] md:!h-[450px] text-purple-400"
           />
         </div>
       </div>

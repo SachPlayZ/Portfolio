@@ -11,8 +11,11 @@ const experiences = [
     position: "Software Engineer",
     period: "March 2025 - May 2025",
     location: "Remote",
-    description:
-      "• Architected DeepResearch UI from the ground up, enabling users to dissect LLM thought processes with interactive visualizations and real-time code execution for stock analysis, enhancing user engagement by 40%.\n• Worked on building the transcripts feature that allows customers to view the conversations happening in their campaigns through the AI SDR.\n• Working on integrating GenAI pipelines into the frontend interface for seamless interactions with our AI employees.",
+    description: [
+      "Architected DeepResearch UI from the ground up, enabling users to dissect LLM thought processes with interactive visualizations and real-time code execution for stock analysis, enhancing user engagement by 40%.",
+      "Worked on building the transcripts feature that allows customers to view the conversations happening in their campaigns through the AI SDR.",
+      "Working on integrating GenAI pipelines into the frontend interface for seamless interactions with our AI employees.",
+    ],
     logo: "/alchemyst-ai.jpeg",
   },
   {
@@ -20,8 +23,11 @@ const experiences = [
     position: "Dev Rel Engineer",
     period: "Dec 2024 - Feb 2025",
     location: "Remote",
-    description:
-      "• Fostered healthy partnerships with 40+ universities across India and onboarded more than 2000 unique users to our product QuillShield.\n• Working on the website and API behind the points program for the Ambassador program of QuillAI.\n• Building the AVS for consensus verified AI Agents on EigenLayer for DeFAI Agents.",
+    description: [
+      "Fostered healthy partnerships with 40+ universities across India and onboarded more than 2000 unique users to our product QuillShield.",
+      "Working on the website and API behind the points program for the Ambassador program of QuillAI.",
+      "Building the AVS for consensus verified AI Agents on EigenLayer for DeFAI Agents.",
+    ],
     logo: "/quillai.webp",
   },
 ];
@@ -97,7 +103,21 @@ export default function ExperienceSection() {
                     </div>
                   </div>
 
-                  <p className="text-gray-300">{exp.description}</p>
+                  <div className="space-y-2">
+                    {exp.description.map((point, idx) => (
+                      <div key={idx} className="flex gap-3 items-start">
+                        <svg
+                          className="w-2 h-2 mt-2 flex-shrink-0"
+                          viewBox="0 0 8 8"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <circle cx="4" cy="4" r="3" fill="#A855F7" />
+                        </svg>
+                        <p className="text-gray-300">{point}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </motion.div>
