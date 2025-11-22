@@ -1,65 +1,133 @@
+import BlurText from "@/components/BlurText";
+import RotatingText from "@/components/RotatingText";
+import SpotifyNowNotch from "@/components/SpotifyNowNotch";
+import VoronoiBackground from "@/components/Voronoi";
+import { Instrument_Serif, Roboto_Condensed } from "next/font/google";
 import Image from "next/image";
 
-export default function Home() {
+const instrumentSerif = Instrument_Serif({
+  weight: ["400"],
+  subsets: ["latin"],
+});
+
+const robotoCondensed = Roboto_Condensed({
+  weight: ["300", "400", "500"],
+  subsets: ["latin"],
+});
+
+const HERO_IMAGE = "/Portfolioalt.png";
+const SOCIAL_LINKS = [
+  {
+    name: "X",
+    href: "https://x.com/singhsach1",
+    icon: "/x.svg",
+  },
+  {
+    name: "LinkedIn",
+    href: "https://www.linkedin.com/in/singhsach",
+    icon: "/linkedin.svg",
+  },
+  {
+    name: "GitHub",
+    href: "https://github.com/SachPlayZ",
+    icon: "/github.svg",
+  },
+];
+
+const Page = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <>
+      <SpotifyNowNotch />
+      <main className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-[#fdf5e7] px-6 py-12 text-slate-900">
+        <VoronoiBackground />
+        <section className="relative z-10 flex w-full max-w-14/16 flex-col gap-8 rounded-[3rem] border border-white/60 bg-white/40 p-8 shadow-[0_20px_80px_rgba(0,0,0,0.25)] backdrop-blur-lg md:flex-row md:items-stretch md:gap-14 md:p-15 min-h-[75vh]">
+          <div className="relative flex flex-1 flex-col text-balance">
+            <div className="space-y-2">
+              <div role="heading" aria-level={1}>
+                <BlurText
+                  text="Hi, I am Sachindra"
+                  animateBy="words"
+                  delay={225}
+                  className={`${instrumentSerif.className} text-[clamp(2.75rem,6vw,5.5rem)] leading-tight text-zinc-600 [&>span:last-child]:text-[#3ba58b] [&>span:last-child]:italic`}
+                  animationFrom={{ filter: "blur(12px)", opacity: 0, y: -60 }}
+                  animationTo={[
+                    { filter: "blur(6px)", opacity: 0.6, y: -10 },
+                    { filter: "blur(0px)", opacity: 1, y: 0 },
+                  ]}
+                />
+              </div>
+              <div
+                className={`${robotoCondensed.className} flex flex-wrap items-center gap-3 text-[clamp(1.4rem,2.5vw,2.1rem)] text-slate-600`}
+              >
+                <div className="inline-flex items-center rounded-lg bg-[#3ba58b] px-2">
+                  <RotatingText
+                    texts={["Full Stack", "Blockchain", "DevRel"]}
+                    rotationInterval={2400}
+                    staggerDuration={0.01}
+                    staggerFrom="last"
+                    transition={{
+                      duration: 0.65,
+                      type: "spring",
+                      stiffness: 320,
+                      damping: 30,
+                    }}
+                    initial={{ y: "100%", opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: "-120%", opacity: 0 }}
+                    mainClassName="justify-center tracking-wide"
+                    splitLevelClassName="overflow-hidden pb-0.5 sm:pb-0.5"
+                    elementLevelClassName="text-white"
+                    splitBy="characters"
+                  />
+                </div>
+                <span>Engineer</span>
+              </div>
+              <p
+                className={`${robotoCondensed.className} mt-12 text-[clamp(1.15rem,2vw,1.35rem)] leading-relaxed text-slate-700`}
+              >
+                I love building fast, scalable, and user-centric products while
+                amplifying developer communities as a DevRel advocate. I&apos;ve
+                worked across startups and hackathons, leading teams, shipping
+                complex systems, and architecting various Web3 protocols and
+                AI-driven platforms. Whether it&apos;s designing prediction
+                markets, crafting intelligent agent pipelines, developing
+                seamless frontend experiences, or guiding teams through new
+                tooling via workshops and content, I focus on creating impactful
+                solutions with clean engineering.
+              </p>
+            </div>
+            <div
+              className={`h-full flex items-end gap-4 ${robotoCondensed.className}`}
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+              {SOCIAL_LINKS.map(({ name, href, icon: Icon }) => (
+                <a
+                  key={name}
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex h-16 w-16 items-center justify-center rounded-full border border-slate-200 bg-white/30 text-slate-600 shadow-md transition hover:-translate-y-1 hover:border-[#3ba58b] hover:text-[#3ba58b]"
+                  aria-label={name}
+                >
+                  <Image src={Icon} alt={name} width={30} height={30} />
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-1 items-center justify-end">
+            <div className="relative w-full max-w-md aspect-7/9 overflow-hidden rounded-[2.5rem] shadow-2xl">
+              <img
+                src={HERO_IMAGE}
+                alt="Sachindra speaking at a conference"
+                className="h-full w-full object-cover object-[45%_20%]"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </section>
       </main>
-    </div>
+    </>
   );
-}
+};
+
+export default Page;
