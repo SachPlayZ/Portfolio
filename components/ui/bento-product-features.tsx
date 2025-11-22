@@ -1,11 +1,11 @@
 "use client";
 
 import * as React from "react";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 // Animation variants for the container to stagger children
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -17,7 +17,7 @@ const containerVariants = {
 };
 
 // Animation variants for each grid item
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
@@ -81,32 +81,50 @@ export const BentoGridShowcase = ({
       )}
     >
       {/* Slot 1: Integration (Spans 2 rows) */}
-      <motion.div variants={itemVariants} className="md:col-span-1 md:row-span-3">
+      <motion.div
+        variants={itemVariants}
+        className="md:col-span-1 md:row-span-3"
+      >
         {integration}
       </motion.div>
 
       {/* Slot 2: Trackers */}
-      <motion.div variants={itemVariants} className="md:col-span-1 md:row-span-1">
+      <motion.div
+        variants={itemVariants}
+        className="md:col-span-1 md:row-span-1"
+      >
         {trackers}
       </motion.div>
 
       {/* Slot 3: Statistic */}
-      <motion.div variants={itemVariants} className="md:col-span-1 md:row-span-1">
+      <motion.div
+        variants={itemVariants}
+        className="md:col-span-1 md:row-span-1"
+      >
         {statistic}
       </motion.div>
 
       {/* Slot 4: Focus */}
-      <motion.div variants={itemVariants} className="md:col-span-1 md:row-span-1">
+      <motion.div
+        variants={itemVariants}
+        className="md:col-span-1 md:row-span-1"
+      >
         {focus}
       </motion.div>
 
       {/* Slot 5: Productivity */}
-      <motion.div variants={itemVariants} className="md:col-span-1 md:row-span-1">
+      <motion.div
+        variants={itemVariants}
+        className="md:col-span-1 md:row-span-1"
+      >
         {productivity}
       </motion.div>
 
       {/* Slot 6: Shortcuts (Spans 2 cols) */}
-      <motion.div variants={itemVariants} className="md:col-span-2 md:row-span-1">
+      <motion.div
+        variants={itemVariants}
+        className="md:col-span-2 md:row-span-1"
+      >
         {shortcuts}
       </motion.div>
     </motion.section>

@@ -20,8 +20,14 @@ export async function POST(req: Request) {
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const body = await req.json();
+    const featured = Boolean(body.featured);
+    const payload = { ...body, featured };
+
     await connectDB();
-    const newBlog = await Blog.create(body);
+    if (featured) {
+      await Blog.updateMany({}, { featured: false });
+    }
+    const newBlog = await Blog.create(payload);
     return NextResponse.json(newBlog, { status: 201 });
   } catch (error) {
     return NextResponse.json({ error: "Failed to create blog" }, { status: 500 });

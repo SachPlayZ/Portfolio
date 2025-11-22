@@ -11,6 +11,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { isMobile } from "react-device-detect";
 
 extend([mixPlugin]);
 
@@ -24,7 +25,7 @@ type SpotifyNowPayload = {
 };
 
 const LEFT_LINKS = [
-  { label: "Home", href: "/" },
+  { label: "Home", href: "/#home" },
   { label: "About", href: "/#about" },
   { label: "Projects", href: "/#projects" },
 ];
@@ -35,8 +36,14 @@ const RIGHT_LINKS = [
   { label: "Contact", href: "/#contact" },
 ];
 
-const navStyles =
-  "flex items-center justify-center w-32 px-2 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-700 transition-all duration-300 hover:text-[#3ba58b] hover:bg-white/50 rounded-full whitespace-nowrap";
+const ALL_LINKS = [...LEFT_LINKS, ...RIGHT_LINKS];
+
+const navStyles = isMobile
+  ? "flex items-center justify-center w-24 px-2 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-700 transition-all duration-300 hover:text-[#3ba58b] hover:bg-white/50 rounded-full whitespace-nowrap"
+  : "flex items-center justify-center w-32 px-2 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-700 transition-all duration-300 hover:text-[#3ba58b] hover:bg-white/50 rounded-full whitespace-nowrap";
+
+const mobileNavStyles =
+  "flex w-full items-center justify-center px-4 py-3 text-[11px] font-bold uppercase tracking-[0.3em] text-slate-700 transition-all duration-300 hover:text-[#3ba58b] hover:bg-white/70 rounded-full";
 
 // 1. NavLinkBar Component
 const NavLinkBar = ({
@@ -63,6 +70,16 @@ const NavLinkBar = ({
     </div>
   );
 };
+
+const MobileNavLinks = () => (
+  <div className="flex w-full max-w-sm flex-col gap-2 rounded-4xl border border-white/20 bg-white/70 p-4 text-center shadow-lg backdrop-blur-md">
+    {ALL_LINKS.map((link) => (
+      <a key={link.label} href={link.href} className={mobileNavStyles}>
+        {link.label}
+      </a>
+    ))}
+  </div>
+);
 
 // 2. SpotifyNotch Component (Center Piece)
 const SpotifyNotch = ({
@@ -128,8 +145,8 @@ const SpotifyNotch = ({
         !colors && "bg-white/40 border-white/30",
         "backdrop-blur-md border",
         isOpen
-          ? "w-[400px] h-[100px] rounded-[2.5rem] px-6"
-          : "w-[120px] h-[28px] rounded-b-xl hover:bg-white/60 cursor-pointer rounded-t-none"
+          ? "w-[360px] h-[100px] rounded-[2.5rem] px-4 md:w-[400px] md:px-6"
+          : "w-[100px] h-[28px] rounded-b-xl hover:bg-white/60 cursor-pointer rounded-t-none md:w-[120px]"
       )}
       onMouseEnter={onMouseEnter}
     >
@@ -311,7 +328,7 @@ export default function SpotifyNowNotch() {
       {/* Backdrop Blur Overlay */}
       <div
         className={cn(
-          "fixed inset-0 z-40 bg-slate-900/10 backdrop-blur-sm transition-opacity duration-500 ease-in-out",
+          "fixed inset-0 z-[90] bg-slate-900/10 backdrop-blur-sm transition-opacity duration-500 ease-in-out",
           isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         )}
         aria-hidden="true"
@@ -319,14 +336,14 @@ export default function SpotifyNowNotch() {
 
       {/* Main Navigation Assembly */}
       <div
-        className="fixed inset-x-0 top-0 z-50 flex justify-center items-start pt-4"
+        className="fixed inset-x-0 top-0 z-[100] flex items-start justify-center pt-4"
         onMouseLeave={() => setIsOpen(false)}
       >
-        <div className="flex items-start gap-8">
+        <div className="flex w-full flex-col items-center gap-4 px-4 md:w-auto md:flex-row md:items-start md:gap-8 md:px-0">
           {/* Left Nav Bar */}
           <div
             className={cn(
-              "transition-all duration-700",
+              "hidden transition-all duration-700 md:block",
               isOpen ? "translate-y-0" : "-translate-y-20"
             )}
           >
@@ -336,7 +353,7 @@ export default function SpotifyNowNotch() {
           {/* Center Notch */}
           <div
             className={cn(
-              "relative z-50 transition-all duration-700",
+              "relative z-50 flex w-full justify-center transition-all duration-700 md:block md:w-auto",
               isOpen ? "translate-y-0" : "-translate-y-4"
             )}
           >
@@ -350,10 +367,22 @@ export default function SpotifyNowNotch() {
             />
           </div>
 
+          {/* Mobile Nav Links */}
+          <div
+            className={cn(
+              "w-full transition-all duration-700 md:hidden",
+              isOpen
+                ? "translate-y-0 opacity-100"
+                : "-translate-y-4 opacity-0 pointer-events-none"
+            )}
+          >
+            <MobileNavLinks />
+          </div>
+
           {/* Right Nav Bar */}
           <div
             className={cn(
-              "transition-all duration-700",
+              "hidden transition-all duration-700 md:block",
               isOpen ? "translate-y-0" : "-translate-y-20"
             )}
           >

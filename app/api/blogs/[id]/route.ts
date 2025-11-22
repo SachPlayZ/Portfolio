@@ -24,6 +24,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     const { id } = await params;
     const body = await req.json();
     await connectDB();
+    if (body.featured === true) {
+      await Blog.updateMany({ _id: { $ne: id } }, { featured: false });
+    }
     const updated = await Blog.findByIdAndUpdate(id, body, { new: true });
     if (!updated) return NextResponse.json({ error: "Blog not found" }, { status: 404 });
     return NextResponse.json(updated);

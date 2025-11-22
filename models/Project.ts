@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 const ProjectSchema = new mongoose.Schema({
   name: { type: String, required: true },
+  logo: { type: String }, // URL to square image
   overview: { type: String },
   demoVideoEmbed: { type: String },
   images: [{ type: String }],

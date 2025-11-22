@@ -1,13 +1,56 @@
 "use client";
 
-import { GitHubCalendar } from "react-github-calendar";
+import { GitHubCalendar, type Activity } from "react-github-calendar";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-export default function GitHubActivity() {
+type GitHubActivityProps = {
+  onTotalCommitsChange?: (total: number) => void;
+};
+
+export default function GitHubActivity({
+  onTotalCommitsChange,
+}: GitHubActivityProps) {
   // Handle hydration mismatch for theme
   const { theme, systemTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+
+  const lastTotalRef = useRef<number | null>(null);
+  const pendingFrame = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (pendingFrame.current) {
+        cancelAnimationFrame(pendingFrame.current);
+      }
+    };
+  }, []);
+
+  const handleTransformData = useCallback(
+    (contributions: Activity[]) => {
+      if (onTotalCommitsChange) {
+        const total = contributions.reduce(
+          (sum, day) => sum + (day?.count ?? 0),
+          0
+        );
+
+        if (lastTotalRef.current !== total) {
+          lastTotalRef.current = total;
+
+          if (pendingFrame.current) {
+            cancelAnimationFrame(pendingFrame.current);
+          }
+
+          pendingFrame.current = requestAnimationFrame(() => {
+            onTotalCommitsChange(total);
+            pendingFrame.current = null;
+          });
+        }
+      }
+      return contributions;
+    },
+    [onTotalCommitsChange]
+  );
 
   useEffect(() => {
     setMounted(true);
@@ -15,26 +58,27 @@ export default function GitHubActivity() {
 
   if (!mounted) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-neutral-100 dark:bg-neutral-900 rounded-lg animate-pulse" />
+      <div className="w-full rounded-2xl border border-white/60 bg-white/40 dark:border-white/15 dark:bg-white/5 animate-pulse" />
     );
   }
 
   const currentTheme = theme === "system" ? systemTheme : theme;
 
   return (
-    <div className="w-full h-full flex flex-col justify-center overflow-hidden">
-      <div className="w-[150%] -mr-[50%]">
+    <div className="w-full overflow-x-auto">
+      <div className="inline-block rounded-2xl border border-black/10 bg-white/70 p-4 shadow-inner backdrop-blur dark:border-white/10 dark:bg-white/5">
         <GitHubCalendar
           username="SachPlayZ"
           colorScheme={currentTheme === "dark" ? "dark" : "light"}
           showMonthLabels={false}
           showColorLegend={false}
-          blockSize={14}
-          blockMargin={5}
+          showTotalCount={false}
+          blockSize={12}
+          blockMargin={4}
+          transformData={handleTransformData}
           style={{
             width: "100%",
             height: "100%",
-            minHeight: "150px",
           }}
         />
       </div>
