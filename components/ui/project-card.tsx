@@ -4,6 +4,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Instrument_Serif, Roboto_Condensed } from "next/font/google";
 import { getYoutubeEmbedUrl } from "@/lib/media";
+import { Project } from "@/types/project";
 
 const instrumentSerif = Instrument_Serif({
   weight: ["400"],
@@ -14,18 +15,6 @@ const robotoCondensed = Roboto_Condensed({
   weight: ["300", "400", "500"],
   subsets: ["latin"],
 });
-
-interface Project {
-  _id: string;
-  name?: string;
-  logo?: string;
-  overview?: string;
-  description?: string;
-  images?: string[];
-  demoVideoEmbed?: string;
-  techStack?: string[];
-  links?: { name: string; url: string }[];
-}
 
 interface ProjectCardProps {
   project: Project;

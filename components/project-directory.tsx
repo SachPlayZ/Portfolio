@@ -11,6 +11,7 @@ import Image from "next/image";
 import { Instrument_Serif, Roboto_Condensed } from "next/font/google";
 import { getYoutubeEmbedUrl } from "@/lib/media";
 import { Globe, Github } from "lucide-react";
+import { Project } from "@/types/project";
 
 const instrumentSerif = Instrument_Serif({
   weight: ["400"],
@@ -21,19 +22,6 @@ const robotoCondensed = Roboto_Condensed({
   weight: ["300", "400", "500"],
   subsets: ["latin"],
 });
-
-// Shared Project Interface (should be in a types file ideally)
-interface Project {
-  _id: string;
-  name: string;
-  logo?: string;
-  overview?: string;
-  description: string;
-  images: string[];
-  demoVideoEmbed?: string;
-  techStack?: string[];
-  links?: { name: string; url: string }[];
-}
 
 type TechStackRecord = {
   name?: string;
@@ -265,7 +253,12 @@ export const ProjectDirectory = () => {
 
   const projectLinks = useMemo(
     () =>
-      (selectedProject?.links ?? []).filter((link) => isValidUrl(link?.url)),
+      (selectedProject?.links ?? []).filter(
+        (link): link is { name?: string; url: string } => {
+          if (!link?.url) return false;
+          return isValidUrl(link.url);
+        }
+      ),
     [selectedProject]
   );
 
@@ -294,6 +287,9 @@ export const ProjectDirectory = () => {
     }
     return <Globe className="w-4 h-4" />;
   };
+
+  const selectedProjectName =
+    selectedProject?.name?.trim() || "Untitled Project";
 
   return (
     <section
@@ -380,7 +376,7 @@ export const ProjectDirectory = () => {
                     <div className="relative w-14 h-14 rounded-full overflow-hidden border border-slate-200 bg-white shadow-sm">
                       <Image
                         src={selectedProject.logo}
-                        alt={selectedProject.name}
+                        alt={selectedProjectName}
                         fill
                         className="object-cover"
                       />
@@ -390,7 +386,7 @@ export const ProjectDirectory = () => {
                     <h3
                       className={`${instrumentSerif.className} text-3xl font-bold text-slate-800`}
                     >
-                      {selectedProject.name}
+                      {selectedProjectName}
                     </h3>
                     <div className="flex gap-2 mt-1 flex-wrap">
                       {selectedProject.techStack?.map((tech, index) => {
@@ -468,7 +464,7 @@ export const ProjectDirectory = () => {
                               ) : (
                                 <Image
                                   src={slide.src}
-                                  alt={selectedProject.name}
+                                  alt={selectedProjectName}
                                   fill
                                   className="object-cover"
                                 />
