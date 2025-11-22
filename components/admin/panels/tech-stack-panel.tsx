@@ -15,7 +15,13 @@ type TechStackRecord = {
   proficiency: number;
 };
 
-const categories = ["Frontend", "Backend", "Blockchain/Web3", "Other"];
+const categories = [
+  "Frontend",
+  "Backend",
+  "Blockchain/Web3",
+  "Languages",
+] as const;
+const FALLBACK_CATEGORY = "Languages";
 
 const createEmptyForm = (): TechStackRecord => ({
   _id: undefined,
@@ -54,7 +60,8 @@ export default function TechStackPanel() {
 
   const grouped = useMemo(() => {
     return records.reduce<Record<string, TechStackRecord[]>>((acc, item) => {
-      const key = item.category || "Other";
+      const key =
+        categories.find((cat) => cat === item.category) ?? FALLBACK_CATEGORY;
       acc[key] = acc[key] ? [...acc[key], item] : [item];
       return acc;
     }, {});

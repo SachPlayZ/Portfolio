@@ -14,9 +14,13 @@ type ExperienceRecord = {
   startDate: string;
   endDate?: string;
   workDone: string[];
+  color?: string;
 };
 
-type ExperienceForm = ExperienceRecord & { workInput: string };
+type ExperienceForm = ExperienceRecord & {
+  workInput: string;
+  isCurrent: boolean;
+};
 
 const createEmptyForm = (): ExperienceForm => ({
   _id: undefined,
@@ -26,7 +30,43 @@ const createEmptyForm = (): ExperienceForm => ({
   endDate: "",
   workDone: [],
   workInput: "",
+  isCurrent: false,
 });
+
+const MONTH_VALUE_REGEX = /^\d{4}-\d{2}$/;
+
+const normalizeMonthValue = (value: string): string => {
+  if (!value) return "";
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  const normalized = trimmed.replace(/\//g, "-");
+  if (MONTH_VALUE_REGEX.test(normalized)) return normalized;
+
+  const parsed = new Date(`${normalized}-01T00:00:00`);
+  if (!Number.isNaN(parsed.getTime())) {
+    return `${parsed.getFullYear()}-${String(parsed.getMonth() + 1).padStart(
+      2,
+      "0"
+    )}`;
+  }
+
+  const fallback = new Date(trimmed);
+  if (!Number.isNaN(fallback.getTime())) {
+    return `${fallback.getFullYear()}-${String(
+      fallback.getMonth() + 1
+    ).padStart(2, "0")}`;
+  }
+  return "";
+};
+
+const formatMonthForInput = (value?: string): string => {
+  if (!value) return "";
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  if (trimmed.toLowerCase() === "present") return "";
+  if (MONTH_VALUE_REGEX.test(trimmed)) return trimmed;
+  return normalizeMonthValue(trimmed);
+};
 
 export default function ExperiencePanel() {
   const [experience, setExperience] = useState<ExperienceRecord[]>([]);
@@ -43,7 +83,9 @@ export default function ExperiencePanel() {
       setExperience(payload);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Failed to fetch experience entries"
+        err instanceof Error
+          ? err.message
+          : "Failed to fetch experience entries"
       );
     } finally {
       setLoading(false);
@@ -60,41 +102,83 @@ export default function ExperiencePanel() {
       .map((line) => line.trim())
       .filter(Boolean);
 
+  const buildPayload = (source: ExperienceForm): ExperienceRecord => {
+    const startDate = normalizeMonthValue(source.startDate);
+    if (!startDate) {
+      throw new Error("Please select a valid start month.");
+    }
+
+    const workDone = splitWork(source.workInput);
+    if (workDone.length === 0) {
+      throw new Error("Add at least one highlight.");
+    }
+
+    const payload: ExperienceRecord = {
+      _id: source._id,
+      orgName: source.orgName.trim(),
+      orgIcon: source.orgIcon?.trim() || "",
+      startDate,
+      endDate: undefined,
+      workDone,
+      color: source.color,
+    };
+
+    if (source.isCurrent) {
+      payload.endDate = "Present";
+    } else if (source.endDate) {
+      const endDate = normalizeMonthValue(source.endDate);
+      if (!endDate) {
+        throw new Error("Please select a valid end month.");
+      }
+      payload.endDate = endDate;
+    }
+
+    return payload;
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setStatus(null);
-    const payload: ExperienceRecord = {
-      orgName: form.orgName,
-      orgIcon: form.orgIcon,
-      startDate: form.startDate,
-      endDate: form.endDate,
-      workDone: splitWork(form.workInput),
-    };
-
+    let payload: ExperienceRecord;
     try {
+      payload = buildPayload(form);
       if (form._id) {
         await adminRequest(`/api/experience/${form._id}`, {
           method: "PATCH",
           body: payload,
         });
       } else {
-        await adminRequest("/api/experience", { method: "POST", body: payload });
+        await adminRequest("/api/experience", {
+          method: "POST",
+          body: payload,
+        });
       }
 
       setStatus("Experience saved");
       setForm(createEmptyForm());
       refresh();
     } catch (err) {
-      setStatus(
-        err instanceof Error ? err.message : "Failed to save experience entry"
-      );
+      const message =
+        err instanceof Error ? err.message : "Failed to save experience entry";
+      setStatus(message);
+      return;
     }
   };
 
   const handleEdit = (record: ExperienceRecord) => {
+    const endValue = record.endDate?.trim();
+    const isCurrent = !endValue || endValue.toLowerCase() === "present";
+
     setForm({
-      ...record,
+      _id: record._id,
+      orgName: record.orgName,
+      orgIcon: record.orgIcon ?? "",
+      startDate: formatMonthForInput(record.startDate),
+      endDate: isCurrent ? "" : formatMonthForInput(record.endDate),
+      workDone: record.workDone ?? [],
       workInput: record.workDone?.join("\n") || "",
+      isCurrent,
+      color: record.color,
     });
   };
 
@@ -123,10 +207,10 @@ export default function ExperiencePanel() {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm text-zinc-300">Start date</label>
+            <label className="text-sm text-zinc-300">Start month</label>
             <input
-              type="text"
-              placeholder="Jan 2023"
+              type="month"
+              placeholder="2023-01"
               className="w-full rounded-lg border border-zinc-800 bg-zinc-900/60 px-3 py-2 text-sm text-white focus:border-purple-500 focus:outline-none"
               value={form.startDate}
               onChange={(e) =>
@@ -139,15 +223,34 @@ export default function ExperiencePanel() {
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <label className="text-sm text-zinc-300">End date</label>
+            <div className="flex items-center justify-between text-sm text-zinc-300">
+              <span>End month</span>
+              <label className="flex items-center gap-2 text-xs text-zinc-400">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 rounded border-zinc-700 bg-zinc-900/60 text-purple-500 focus:ring-purple-500"
+                  checked={form.isCurrent}
+                  onChange={(e) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      isCurrent: e.target.checked,
+                      endDate: e.target.checked ? "" : prev.endDate,
+                    }))
+                  }
+                />
+                Currently working
+              </label>
+            </div>
             <input
-              type="text"
-              placeholder="Present"
+              type="month"
+              placeholder="2023-12"
               className="w-full rounded-lg border border-zinc-800 bg-zinc-900/60 px-3 py-2 text-sm text-white focus:border-purple-500 focus:outline-none"
-              value={form.endDate}
+              value={form.isCurrent ? "" : form.endDate}
               onChange={(e) =>
                 setForm((prev) => ({ ...prev, endDate: e.target.value }))
               }
+              disabled={form.isCurrent}
+              min={form.startDate || undefined}
             />
           </div>
         </div>
@@ -155,7 +258,9 @@ export default function ExperiencePanel() {
         <ImageUpload
           label="Organization icon"
           value={form.orgIcon ? [form.orgIcon] : []}
-          onChange={(images) => setForm((prev) => ({ ...prev, orgIcon: images[0] || "" }))}
+          onChange={(images) =>
+            setForm((prev) => ({ ...prev, orgIcon: images[0] || "" }))
+          }
         />
 
         <div className="space-y-2">
@@ -165,15 +270,23 @@ export default function ExperiencePanel() {
           <textarea
             className="min-h-[120px] w-full rounded-lg border border-zinc-800 bg-zinc-900/60 px-3 py-2 text-sm text-white focus:border-purple-500 focus:outline-none"
             value={form.workInput}
-            onChange={(e) => setForm((prev) => ({ ...prev, workInput: e.target.value }))}
+            onChange={(e) =>
+              setForm((prev) => ({ ...prev, workInput: e.target.value }))
+            }
             required
           />
         </div>
 
         <div className="flex items-center gap-3">
-          <Button type="submit">{form._id ? "Update entry" : "Add entry"}</Button>
+          <Button type="submit">
+            {form._id ? "Update entry" : "Add entry"}
+          </Button>
           {form._id && (
-            <Button type="button" variant="ghost" onClick={() => setForm(createEmptyForm())}>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setForm(createEmptyForm())}
+            >
               Cancel edit
             </Button>
           )}
@@ -202,7 +315,9 @@ export default function ExperiencePanel() {
                   />
                 )}
                 <div>
-                  <h3 className="text-lg font-semibold text-white">{record.orgName}</h3>
+                  <h3 className="text-lg font-semibold text-white">
+                    {record.orgName}
+                  </h3>
                   <p className="text-sm text-zinc-400">
                     {record.startDate} – {record.endDate || "Present"}
                   </p>
@@ -214,10 +329,17 @@ export default function ExperiencePanel() {
                 ))}
               </ul>
               <div className="mt-4 flex gap-2">
-                <Button size="sm" variant="secondary" onClick={() => handleEdit(record)}>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => handleEdit(record)}
+                >
                   Edit
                 </Button>
-                <ConfirmButton size="sm" onConfirm={() => handleDelete(record._id)}>
+                <ConfirmButton
+                  size="sm"
+                  onConfirm={() => handleDelete(record._id)}
+                >
                   Delete
                 </ConfirmButton>
               </div>
@@ -228,4 +350,3 @@ export default function ExperiencePanel() {
     </AdminShell>
   );
 }
-

@@ -24,7 +24,6 @@ type ProjectRecord = {
 };
 
 type ProjectForm = ProjectRecord & {
-  techStackInput: string;
   linksInput: string;
 };
 
@@ -38,7 +37,6 @@ const createEmptyForm = (): ProjectForm => ({
   description: "",
   techStack: [],
   links: [],
-  techStackInput: "",
   linksInput: "",
 });
 
@@ -48,6 +46,8 @@ export default function ProjectsPanel() {
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [form, setForm] = useState<ProjectForm>(createEmptyForm);
+  const [techOptions, setTechOptions] = useState<string[]>([]);
+  const [techOptionsLoading, setTechOptionsLoading] = useState(true);
 
   const refresh = async () => {
     setLoading(true);
@@ -66,16 +66,33 @@ export default function ProjectsPanel() {
     refresh();
   }, []);
 
+  useEffect(() => {
+    const fetchTechOptions = async () => {
+      setTechOptionsLoading(true);
+      try {
+        const res = await fetch("/api/tech-stack", { cache: "no-store" });
+        if (!res.ok) throw new Error("Failed to load tech stack options");
+        const data = await res.json();
+        const names = new Set<string>();
+        Object.values(data ?? {}).forEach((group) => {
+          (group as { name: string }[]).forEach((item) => {
+            if (item?.name) names.add(item.name);
+          });
+        });
+        setTechOptions(Array.from(names).sort());
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setTechOptionsLoading(false);
+      }
+    };
+    fetchTechOptions();
+  }, []);
+
   const currentFeatured = useMemo(
     () => projects.find((project) => project.featured),
     [projects]
   );
-
-  const parseTechStack = (input: string) =>
-    input
-      .split(",")
-      .map((item) => item.trim())
-      .filter(Boolean);
 
   const parseLinks = (input: string): Link[] =>
     input
@@ -98,6 +115,26 @@ export default function ProjectsPanel() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setStatus(null);
+    const invalidLinks: string[] = [];
+    const links = parseLinks(form.linksInput).filter((link) => {
+      try {
+        new URL(link.url);
+        return true;
+      } catch {
+        invalidLinks.push(link.url);
+        return false;
+      }
+    });
+    if (invalidLinks.length > 0) {
+      setStatus(`Invalid link(s): ${invalidLinks.join(", ")}`);
+      return;
+    }
+    const techSelection =
+      form.techStack?.filter((tech) => techOptions.includes(tech)) ?? [];
+    if (!techSelection.length) {
+      setStatus("Select at least one tech from the available stack.");
+      return;
+    }
     const payload: ProjectRecord & { _id?: string } = {
       _id: form._id,
       name: form.name,
@@ -106,8 +143,8 @@ export default function ProjectsPanel() {
       demoVideoEmbed: form.demoVideoEmbed,
       images: form.images,
       description: form.description,
-      techStack: parseTechStack(form.techStackInput),
-      links: parseLinks(form.linksInput),
+      techStack: techSelection,
+      links,
     };
 
     try {
@@ -127,7 +164,6 @@ export default function ProjectsPanel() {
       images: [...(project.images || [])],
       techStack: [...(project.techStack || [])],
       links: [...(project.links || [])],
-      techStackInput: project.techStack?.join(", ") || "",
       linksInput: formatLinks(project.links || []),
     });
   };
@@ -199,16 +235,42 @@ export default function ProjectsPanel() {
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <label className="text-sm text-zinc-300">
-              Tech stack (comma separated)
-            </label>
-            <input
-              className="w-full rounded-lg border border-zinc-800 bg-zinc-900/60 px-3 py-2 text-sm text-white focus:border-purple-500 focus:outline-none"
-              value={form.techStackInput}
-              onChange={(e) =>
-                setForm((prev) => ({ ...prev, techStackInput: e.target.value }))
-              }
-            />
+            <label className="text-sm text-zinc-300">Tech stack</label>
+            <div className="flex flex-wrap gap-2 rounded-lg border border-zinc-800 bg-zinc-900/60 p-3">
+              {techOptionsLoading ? (
+                <p className="text-xs text-zinc-400">Loading options…</p>
+              ) : techOptions.length > 0 ? (
+                techOptions.map((tech) => {
+                  const isSelected = form.techStack?.includes(tech);
+                  return (
+                    <button
+                      key={tech}
+                      type="button"
+                      onClick={() =>
+                        setForm((prev) => {
+                          const current = prev.techStack ?? [];
+                          const next = isSelected
+                            ? current.filter((item) => item !== tech)
+                            : [...current, tech];
+                          return { ...prev, techStack: next };
+                        })
+                      }
+                      className={`text-xs px-3 py-1 rounded-full border transition-colors ${
+                        isSelected
+                          ? "bg-[#3ba58b] text-white border-[#3ba58b]"
+                          : "border-zinc-700 text-zinc-200 hover:border-[#3ba58b]"
+                      }`}
+                    >
+                      {tech}
+                    </button>
+                  );
+                })
+              ) : (
+                <p className="text-xs text-zinc-400">
+                  No tech stack options available yet.
+                </p>
+              )}
+            </div>
           </div>
           <div className="space-y-2">
             <label className="text-sm text-zinc-300">

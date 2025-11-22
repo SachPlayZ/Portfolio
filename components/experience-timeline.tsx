@@ -1,9 +1,14 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { Instrument_Serif, Roboto_Condensed } from "next/font/google";
 import { isMobile } from "react-device-detect";
+import { FastAverageColor } from "fast-average-color";
+import { colord, extend } from "colord";
+import mixPlugin from "colord/plugins/mix";
+
+extend([mixPlugin]);
 
 const instrumentSerif = Instrument_Serif({
   weight: ["400"],
@@ -20,47 +25,13 @@ interface Experience {
   _id: string;
   orgName: string;
   orgIcon?: string;
-  startDate: string; // "YYYY-MM" format preferred for easy parsing
-  endDate?: string; // "YYYY-MM" or "Present"
+  startDate: string;
+  endDate?: string;
   workDone: string[];
-  color?: string; // Optional override for now, will be dominant color later
+  color?: string;
 }
 
-const MOCK_EXPERIENCE: Experience[] = [
-  {
-    _id: "1",
-    orgName: "QuillAI Network",
-    orgIcon: "https://i.pravatar.cc/150?u=quill",
-    startDate: "2024-12",
-    endDate: "2025-02",
-    workDone: [
-      "Developed core AI infrastructure",
-      "Optimized neural network inference",
-    ],
-    color: "#000000", // Black
-  },
-  {
-    _id: "2",
-    orgName: "Alchemyst AI",
-    orgIcon: "https://i.pravatar.cc/150?u=alchemyst",
-    startDate: "2025-03",
-    endDate: "2025-06",
-    workDone: ["Lead frontend architect", "Implemented generative UI systems"],
-    color: "#8B4513", // Brown
-  },
-  {
-    _id: "3",
-    orgName: "EngageOS",
-    orgIcon: "https://i.pravatar.cc/150?u=engageos",
-    startDate: "2025-07",
-    endDate: "Present",
-    workDone: [
-      "Building next-gen engagement protocols",
-      "Scaling to 1M+ users",
-    ],
-    color: "#800080", // Purple
-  },
-];
+const DEFAULT_LINE_COLOR = "#3ba58b";
 
 // Helper to get months difference between two dates
 const getMonthDiff = (d1: Date, d2: Date) => {
@@ -82,22 +53,146 @@ const generateMonthLabels = (startDate: Date, endDate: Date) => {
   return months;
 };
 
+const parseMonthString = (value?: string, fallback = new Date()) => {
+  if (!value) return new Date(fallback);
+  if (value.toLowerCase() === "present") return new Date();
+  const parsed = new Date(`${value}-01T00:00:00`);
+  return Number.isNaN(parsed.getTime()) ? new Date(fallback) : parsed;
+};
+
 export const ExperienceTimeline = () => {
-  const [experiences, setExperiences] = useState<Experience[]>(MOCK_EXPERIENCE);
+  const [experiences, setExperiences] = useState<Experience[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [lineColors, setLineColors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Calculate Timeline Range
-  // Hardcoded range based on user request: Dec 2024 to Present (Nov 2025 for example context)
-  const timelineStart = new Date("2024-12-01");
-  const timelineEnd = new Date("2025-11-01"); // Approx "Present" relative to user prompt context
+  useEffect(() => {
+    let isMounted = true;
+    const fetchExperience = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch("/api/experience", { cache: "no-store" });
+        if (!res.ok) {
+          throw new Error("Failed to load experience");
+        }
+        const data = await res.json();
+        if (isMounted) {
+          setExperiences(Array.isArray(data) ? data : []);
+        }
+      } catch (err) {
+        console.error(err);
+        if (isMounted) {
+          setExperiences([]);
+          setError("Unable to fetch experience data.");
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
 
-  const totalMonths = getMonthDiff(timelineStart, timelineEnd);
-  const monthLabels = generateMonthLabels(timelineStart, timelineEnd);
+    fetchExperience();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!experiences.length) {
+      setLineColors({});
+      return;
+    }
+
+    let isCancelled = false;
+    const fac = new FastAverageColor();
+
+    const deriveColors = async () => {
+      const entries = await Promise.all(
+        experiences.map(async (exp) => {
+          if (exp.color) {
+            return [exp._id, exp.color] as const;
+          }
+
+          if (!exp.orgIcon) {
+            return [exp._id, DEFAULT_LINE_COLOR] as const;
+          }
+
+          try {
+            const color = await fac.getColorAsync(exp.orgIcon);
+            const base = colord(color.hex);
+            const accent = base.isDark()
+              ? base.mix("#000000", 0.25).saturate(0.15).toHex()
+              : base.mix("#000000", 0.7).saturate(0.1).toHex();
+            return [exp._id, accent] as const;
+          } catch {
+            return [exp._id, DEFAULT_LINE_COLOR] as const;
+          }
+        })
+      );
+
+      if (!isCancelled) {
+        setLineColors(Object.fromEntries(entries));
+      }
+    };
+
+    deriveColors();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [experiences]);
+
+  const defaultRange = useMemo(() => {
+    const end = new Date();
+    const start = new Date(end);
+    start.setMonth(start.getMonth() - 11);
+    return { start, end };
+  }, []);
+
+  const { timelineStart, timelineEnd } = useMemo(() => {
+    if (!experiences.length) {
+      return {
+        timelineStart: defaultRange.start,
+        timelineEnd: defaultRange.end,
+      };
+    }
+
+    let minStart = new Date("9999-01-01T00:00:00");
+    let maxEnd = new Date("1970-01-01T00:00:00");
+
+    experiences.forEach((exp) => {
+      const start = parseMonthString(exp.startDate, defaultRange.start);
+      const end = parseMonthString(exp.endDate, defaultRange.end);
+      if (start < minStart) minStart = new Date(start);
+      if (end > maxEnd) maxEnd = new Date(end);
+    });
+
+    if (maxEnd < minStart) {
+      maxEnd = new Date(minStart);
+    }
+
+    const paddedEnd = new Date(maxEnd);
+    paddedEnd.setMonth(paddedEnd.getMonth() + 1);
+
+    return {
+      timelineStart: minStart,
+      timelineEnd: paddedEnd,
+    };
+  }, [defaultRange.end, defaultRange.start, experiences]);
+
+  const totalMonths = Math.max(1, getMonthDiff(timelineStart, timelineEnd));
+  const monthLabels = useMemo(
+    () => generateMonthLabels(timelineStart, timelineEnd),
+    [timelineEnd, timelineStart]
+  );
 
   const handleToggle = (id: string) => {
     setExpandedId((prev) => (prev === id ? null : id));
@@ -155,7 +250,7 @@ export const ExperienceTimeline = () => {
           >
             {monthLabels.map((date, index) => (
               <div
-                key={index}
+                key={`${date.toISOString()}-${index}`}
                 className={`flex items-center justify-center relative group ${
                   isMobile ? "w-full flex-row" : "flex-col h-full"
                 }`}
@@ -190,123 +285,161 @@ export const ExperienceTimeline = () => {
           </div>
 
           {/* Experience Segments */}
-          {experiences.map((exp, index) => {
-            const start = new Date(`${exp.startDate}-01`);
-            const end =
-              exp.endDate === "Present"
-                ? new Date()
-                : new Date(`${exp.endDate}-01`);
+          {loading ? (
+            <div className="flex h-full w-full items-center justify-center">
+              <div className="h-12 w-12 rounded-full border-4 border-white/40 border-t-[#3ba58b] animate-spin" />
+            </div>
+          ) : experiences.length === 0 ? (
+            <div className="flex h-full w-full items-center justify-center text-center text-slate-500">
+              {error ?? "No experience entries added yet."}
+            </div>
+          ) : (
+            experiences.map((exp, index) => {
+              const start = parseMonthString(exp.startDate, timelineStart);
+              const end = parseMonthString(
+                exp.endDate,
+                exp.endDate?.toLowerCase() === "present"
+                  ? new Date()
+                  : timelineEnd
+              );
 
-            // Clamp dates to timeline range
-            const effectiveStart =
-              start < timelineStart ? timelineStart : start;
-            const effectiveEnd = end > timelineEnd ? timelineEnd : end;
+              const effectiveStart =
+                start < timelineStart ? timelineStart : start;
+              const effectiveEnd = end > timelineEnd ? timelineEnd : end;
 
-            // Calculate position and width percentage
-            const startMonthIndex = getMonthDiff(timelineStart, effectiveStart);
-            const durationMonths = getMonthDiff(effectiveStart, effectiveEnd);
+              const startMonthIndex = getMonthDiff(
+                timelineStart,
+                effectiveStart
+              );
+              const durationMonths = Math.max(
+                0,
+                getMonthDiff(effectiveStart, effectiveEnd)
+              );
 
-            // Extend the width to cover the FULL end month (so it touches the start of the next month)
-            const percentStart = (startMonthIndex / totalMonths) * 100;
-            const percentSize = ((durationMonths + 1) / totalMonths) * 100;
+              const percentStart = (startMonthIndex / totalMonths) * 100;
+              const percentSize = ((durationMonths + 1) / totalMonths) * 100;
 
-            // Alternating positions: 0 = Top/Left, 1 = Bottom/Right
-            const isPrimarySide = index % 2 === 0;
+              const isPrimarySide = index % 2 === 0;
+              const accentColor = lineColors[exp._id] ?? DEFAULT_LINE_COLOR;
 
-            return (
-              <motion.div
-                key={exp._id}
-                className={`absolute z-20 flex items-center justify-center group ${
-                  isMobile
-                    ? "left-1/2 -translate-x-1/2 w-2"
-                    : "h-2 top-1/2 -translate-y-1/2"
-                }`}
-                style={{
-                  [isMobile ? "top" : "left"]: `${percentStart}%`,
-                  [isMobile ? "height" : "width"]: `${percentSize}%`,
-                  backgroundColor: exp.color || "#3ba58b",
-                }}
-                initial={
-                  isMobile
-                    ? { scaleY: 0, opacity: 0 }
-                    : { scaleX: 0, opacity: 0 }
-                }
-                whileInView={
-                  isMobile
-                    ? { scaleY: 1, opacity: 1 }
-                    : { scaleX: 1, opacity: 1 }
-                }
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-              >
-                {/* Floating Card - ALWAYS VISIBLE (opacity-100) */}
+              const markerBase =
+                "absolute z-30 w-4 h-4 rounded-full border-2 border-white shadow-md";
+              const startMarkerClasses = isMobile
+                ? "top-0 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                : "left-0 top-1/2 -translate-x-1/2 -translate-y-1/2";
+              const endMarkerClasses = isMobile
+                ? "top-full left-1/2 -translate-x-1/2 -translate-y-1/2"
+                : "left-full top-1/2 -translate-x-1/2 -translate-y-1/2";
+
+              return (
                 <motion.div
-                  className={`absolute flex items-center gap-3 w-max pointer-events-auto cursor-pointer z-30 ${
+                  key={exp._id}
+                  className={`absolute z-20 group ${
                     isMobile
-                      ? isPrimarySide
-                        ? "right-8 flex-row"
-                        : "left-8 flex-row-reverse"
-                      : `flex-col ${isPrimarySide ? "bottom-20" : "top-20"}`
+                      ? "left-1/2 -translate-x-1/2 w-2"
+                      : "h-2 top-1/2 -translate-y-1/2"
                   }`}
-                  initial={{
-                    opacity: 0,
-                    [isMobile ? "x" : "y"]: isMobile
-                      ? isPrimarySide
-                        ? -20
-                        : 20
-                      : isPrimarySide
-                      ? 20
-                      : -20,
+                  style={{
+                    [isMobile ? "top" : "left"]: `${percentStart}%`,
+                    [isMobile ? "height" : "width"]: `${percentSize}%`,
+                    backgroundColor: accentColor,
                   }}
-                  whileInView={{ opacity: 1, [isMobile ? "x" : "y"]: 0 }}
-                  transition={{ delay: 0.5, duration: 0.5 }}
-                  onClick={() => handleToggle(exp._id)}
+                  initial={
+                    isMobile
+                      ? { scaleY: 0, opacity: 0 }
+                      : { scaleX: 0, opacity: 0 }
+                  }
+                  whileInView={
+                    isMobile
+                      ? { scaleY: 1, opacity: 1 }
+                      : { scaleX: 1, opacity: 1 }
+                  }
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: 0.2 }}
                 >
-                  {/* Logo Group */}
-                  <div
-                    className={`flex items-center gap-2 ${
-                      isMobile
-                        ? isPrimarySide
-                          ? "flex-row"
-                          : "flex-row-reverse"
-                        : `flex-col ${
-                            isPrimarySide ? "flex-col-reverse" : "flex-col"
-                          }`
-                    }`}
-                  >
-                    {/* Name */}
-                    <div
-                      className={`${instrumentSerif.className} text-2xl font-bold text-slate-800 whitespace-nowrap bg-white/80 backdrop-blur-sm px-4 py-2 rounded-xl shadow-sm border border-slate-100/50`}
-                    >
-                      {exp.orgName}
-                    </div>
+                  <div className="relative flex items-center justify-center w-full h-full">
+                    {/* Start & End Markers */}
+                    <span
+                      aria-hidden="true"
+                      className={`${markerBase} ${startMarkerClasses}`}
+                      style={{ backgroundColor: accentColor }}
+                    />
+                    <span
+                      aria-hidden="true"
+                      className={`${markerBase} ${endMarkerClasses}`}
+                      style={{ backgroundColor: accentColor }}
+                    />
 
-                    {/* Logo */}
-                    <div className="w-16 h-16 rounded-full bg-white border-4 border-white shadow-[0_4px_20px_rgba(0,0,0,0.1)] overflow-hidden relative z-30 hover:scale-110 transition-transform duration-300 shrink-0">
-                      {exp.orgIcon ? (
-                        <Image
-                          src={exp.orgIcon}
-                          alt={exp.orgName}
-                          fill
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-400">
-                          {exp.orgName.substring(0, 2)}
+                    {/* Floating Card - ALWAYS VISIBLE (opacity-100) */}
+                    <motion.div
+                      className={`absolute flex items-center gap-3 w-max pointer-events-auto cursor-pointer z-30 ${
+                        isMobile
+                          ? isPrimarySide
+                            ? "right-8 flex-row"
+                            : "left-8 flex-row-reverse"
+                          : `flex-col ${isPrimarySide ? "bottom-20" : "top-20"}`
+                      }`}
+                      initial={{
+                        opacity: 0,
+                        [isMobile ? "x" : "y"]: isMobile
+                          ? isPrimarySide
+                            ? -20
+                            : 20
+                          : isPrimarySide
+                          ? 20
+                          : -20,
+                      }}
+                      whileInView={{ opacity: 1, [isMobile ? "x" : "y"]: 0 }}
+                      transition={{ delay: 0.5, duration: 0.5 }}
+                      onClick={() => handleToggle(exp._id)}
+                    >
+                      {/* Logo Group */}
+                      <div
+                        className={`flex items-center gap-2 ${
+                          isMobile
+                            ? isPrimarySide
+                              ? "flex-row"
+                              : "flex-row-reverse"
+                            : `flex-col ${
+                                isPrimarySide ? "flex-col-reverse" : "flex-col"
+                              }`
+                        }`}
+                      >
+                        {/* Name */}
+                        <div
+                          className={`${instrumentSerif.className} text-2xl font-bold text-slate-800 whitespace-nowrap bg-white/80 backdrop-blur-sm px-4 py-2 rounded-xl shadow-sm border border-slate-100/50`}
+                        >
+                          {exp.orgName}
                         </div>
-                      )}
-                    </div>
+
+                        {/* Logo */}
+                        <div className="w-16 h-16 rounded-full bg-white border-4 border-white shadow-[0_4px_20px_rgba(0,0,0,0.1)] overflow-hidden relative z-30 hover:scale-110 transition-transform duration-300 shrink-0">
+                          {exp.orgIcon ? (
+                            <Image
+                              src={exp.orgIcon}
+                              alt={exp.orgName}
+                              fill
+                              className="object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-400">
+                              {exp.orgName.substring(0, 2)}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </motion.div>
+
+                    {/* Hover Glow Effect on Line */}
+                    <div
+                      className="absolute inset-0 opacity-0 group-hover:opacity-50 blur-md transition-opacity duration-300"
+                      style={{ backgroundColor: accentColor }}
+                    />
                   </div>
                 </motion.div>
-
-                {/* Hover Glow Effect on Line */}
-                <div
-                  className="absolute inset-0 opacity-0 group-hover:opacity-50 blur-md transition-opacity duration-300"
-                  style={{ backgroundColor: exp.color || "#3ba58b" }}
-                />
-              </motion.div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
       </div>
 

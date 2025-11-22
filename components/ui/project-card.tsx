@@ -1,8 +1,9 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Instrument_Serif, Roboto_Condensed } from "next/font/google";
+import { getYoutubeEmbedUrl } from "@/lib/media";
 
 const instrumentSerif = Instrument_Serif({
   weight: ["400"],
@@ -36,6 +37,17 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   onOpenDetails,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const demoVideoUrl = useMemo(() => {
+    if (!project.demoVideoEmbed) return undefined;
+    return getYoutubeEmbedUrl(project.demoVideoEmbed) ?? project.demoVideoEmbed;
+  }, [project.demoVideoEmbed]);
+
+  const demoVideoId = useMemo(() => {
+    if (!demoVideoUrl) return "";
+    const parts = demoVideoUrl.split("/");
+    const lastPart = parts[parts.length - 1] ?? "";
+    return lastPart.split("?")[0];
+  }, [demoVideoUrl]);
 
   return (
     <motion.div
@@ -101,7 +113,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
       {/* Media Area */}
       <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shadow-inner">
         <AnimatePresence mode="wait">
-          {isHovered && project.demoVideoEmbed ? (
+          {isHovered && demoVideoUrl ? (
             <motion.div
               key="video"
               initial={{ opacity: 0 }}
@@ -110,12 +122,10 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
               className="absolute inset-0 z-10"
             >
               <iframe
-                src={`${project.demoVideoEmbed}${
-                  project.demoVideoEmbed.includes("?") ? "&" : "?"
-                }autoplay=1&mute=1&controls=0&loop=1&playlist=${project.demoVideoEmbed
-                  .split("/")
-                  .pop()}&showinfo=0&modestbranding=1&rel=0&iv_load_policy=3&fs=0&disablekb=1`}
-                className="w-full h-full pointer-events-none scale-[1.35]"
+                src={`${demoVideoUrl}${
+                  demoVideoUrl.includes("?") ? "&" : "?"
+                }autoplay=1&mute=1&controls=0&loop=1&start=60&playlist=${demoVideoId}&showinfo=0&modestbranding=1&rel=0&iv_load_policy=3&fs=0&disablekb=1`}
+                className="w-full h-full pointer-events-none scale-[1.7]"
                 allow="autoplay; encrypted-media"
               />
             </motion.div>

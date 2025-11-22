@@ -6,11 +6,17 @@ import { authOptions } from "../auth/auth.config";
 
 class ValidationError extends Error {}
 
-const categories = ["Frontend", "Backend", "Blockchain/Web3", "Other"] as const;
+const categories = [
+  "Frontend",
+  "Backend",
+  "Blockchain/Web3",
+  "Languages",
+] as const;
 type Category = (typeof categories)[number];
+const FALLBACK_CATEGORY: Category = "Languages";
 
 const normalizeCategory = (value?: string): Category => {
-  if (!value) return "Other";
+  if (!value) return FALLBACK_CATEGORY;
   const normalized = value.trim().toLowerCase();
   const match = categories.find(
     (category) =>
@@ -18,7 +24,7 @@ const normalizeCategory = (value?: string): Category => {
       category.replace(/\s+/g, "").toLowerCase() ===
         normalized.replace(/\s+/g, "")
   );
-  return match ?? "Other";
+  return match ?? FALLBACK_CATEGORY;
 };
 
 const sanitizeTechPayload = (payload: any) => {
@@ -57,7 +63,7 @@ export async function GET() {
         Frontend: [],
         Backend: [],
         "Blockchain/Web3": [],
-        Other: [],
+        Languages: [],
       }
     );
 
