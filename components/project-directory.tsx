@@ -363,14 +363,14 @@ export const ProjectDirectory = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-10 bg-slate-900/40 backdrop-blur-sm"
+            className="fixed inset-0 z-9999 flex items-center justify-center p-4 md:p-10 bg-slate-900/40 backdrop-blur-sm"
             onClick={() => setSelectedProject(null)}
           >
             <motion.div
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
-              className="bg-[#fdf5e7] border border-white/60 rounded-4xl w-full max-w-5xl lg:max-w-6xl max-h-[90vh] overflow-hidden flex flex-col shadow-[0_20px_80px_rgba(0,0,0,0.2)]"
+              className="relative z-10000 bg-[#fdf5e7] border border-white/60 rounded-4xl w-full max-w-5xl lg:max-w-6xl max-h-[90vh] overflow-hidden flex flex-col shadow-[0_20px_80px_rgba(0,0,0,0.2)]"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Modal Header */}

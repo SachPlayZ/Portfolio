@@ -89,21 +89,32 @@ export default function AchievementsSection() {
 
   useEffect(() => {
     const updateDimensions = () => {
-      if (scrollContainerRef.current) {
-        setScrollWidth(scrollContainerRef.current.scrollWidth);
-        setViewportWidth(window.innerWidth);
-      }
+      if (!scrollContainerRef.current) return;
+      setScrollWidth(scrollContainerRef.current.scrollWidth);
+      const parentWidth =
+        scrollContainerRef.current.parentElement?.clientWidth ?? window.innerWidth;
+      setViewportWidth(parentWidth);
     };
 
-    // Wait for layout to settle
-    const timer = setTimeout(updateDimensions, 100);
+    updateDimensions();
     window.addEventListener("resize", updateDimensions);
 
     return () => {
       window.removeEventListener("resize", updateDimensions);
-      clearTimeout(timer);
     };
   }, []);
+
+  useEffect(() => {
+    if (loading) return;
+    const frame = requestAnimationFrame(() => {
+      if (!scrollContainerRef.current) return;
+      setScrollWidth(scrollContainerRef.current.scrollWidth);
+      const parentWidth =
+        scrollContainerRef.current.parentElement?.clientWidth ?? window.innerWidth;
+      setViewportWidth(parentWidth);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [achievements, loading]);
 
   return (
     <section

@@ -458,14 +458,14 @@ export const ExperienceTimeline = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm"
+                className="fixed inset-0 z-9999 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm"
                 onClick={() => setExpandedId(null)}
               >
                 <motion.div
                   initial={{ scale: 0.9, y: 20 }}
                   animate={{ scale: 1, y: 0 }}
                   exit={{ scale: 0.9, y: 20 }}
-                  className="bg-[#fdf5e7] border border-white/60 rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl relative"
+                  className="relative z-10000 bg-[#fdf5e7] border border-white/60 rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <button

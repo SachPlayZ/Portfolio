@@ -1,12 +1,28 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import AdminShell from "../admin-shell";
 import { Button } from "@/components/ui/button";
 import ConfirmButton from "../confirm-button";
 import ImageUpload from "../image-upload";
 import StatusBadge from "../status-badge";
 import { adminRequest } from "@/lib/admin-client";
+import { GripVertical } from "lucide-react";
+import {
+  DndContext,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  verticalListSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 type Link = { name: string; url: string };
 
@@ -21,6 +37,7 @@ type ProjectRecord = {
   techStack: string[];
   links: Link[];
   featured?: boolean;
+  order?: number;
 };
 
 type ProjectForm = ProjectRecord & {
@@ -48,6 +65,14 @@ export default function ProjectsPanel() {
   const [form, setForm] = useState<ProjectForm>(createEmptyForm);
   const [techOptions, setTechOptions] = useState<string[]>([]);
   const [techOptionsLoading, setTechOptionsLoading] = useState(true);
+  const [orderStatus, setOrderStatus] = useState<string | null>(null);
+  const [reordering, setReordering] = useState(false);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 },
+    })
+  );
 
   const refresh = async () => {
     setLoading(true);
@@ -93,6 +118,11 @@ export default function ProjectsPanel() {
     () => projects.find((project) => project.featured),
     [projects]
   );
+
+  const sortableProjects = projects.filter(
+    (project): project is ProjectRecord & { _id: string } => Boolean(project._id)
+  );
+  const sortableIds = sortableProjects.map((project) => project._id);
 
   const parseLinks = (input: string): Link[] =>
     input
@@ -181,6 +211,40 @@ export default function ProjectsPanel() {
       body: { projectId: id },
     });
     refresh();
+  };
+
+  const handleProjectReorder = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const activeId = String(active.id);
+    const overId = String(over.id);
+    const oldIndex = projects.findIndex((project) => project._id === activeId);
+    const newIndex = projects.findIndex((project) => project._id === overId);
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    const reordered = arrayMove(projects, oldIndex, newIndex);
+    setProjects(reordered);
+    setReordering(true);
+    setOrderStatus("Saving order…");
+    try {
+      await adminRequest("/api/projects/reorder", {
+        method: "PATCH",
+        body: {
+          ids: reordered
+            .map((project) => project._id)
+            .filter((value): value is string => Boolean(value)),
+        },
+      });
+      setOrderStatus("Order updated");
+    } catch (err) {
+      setOrderStatus(
+        err instanceof Error ? err.message : "Failed to update order"
+      );
+      refresh();
+    } finally {
+      setReordering(false);
+    }
   };
 
   return (
@@ -316,42 +380,38 @@ export default function ProjectsPanel() {
         {!loading && projects.length === 0 && (
           <p className="text-sm text-zinc-500">No projects yet.</p>
         )}
-        <div className="grid gap-4 lg:grid-cols-2">
-          {projects.map((project) => (
-            <div
-              key={project._id}
-              className="rounded-3xl border border-zinc-800 bg-zinc-900/30 p-5"
-            >
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <h3 className="text-lg font-semibold text-white">{project.name}</h3>
-                  <p className="text-sm text-zinc-400">
-                    {project.techStack?.join(", ") || "No stack"}
-                  </p>
-                </div>
-                {project.featured && (
-                  <StatusBadge label="Featured" tone="success" />
-                )}
-              </div>
-              <p className="mt-3 text-sm text-zinc-300 line-clamp-3">
-                {project.description}
-              </p>
-              <div className="mt-4 flex flex-wrap gap-2">
-                <Button size="sm" variant="secondary" onClick={() => handleEdit(project)}>
-                  Edit
-                </Button>
-                <ConfirmButton size="sm" onConfirm={() => handleDelete(project._id)}>
-                  Delete
-                </ConfirmButton>
-                {!project.featured && (
-                  <Button size="sm" onClick={() => handleFeature(project._id)}>
-                    Mark featured
-                  </Button>
-                )}
-              </div>
+        {sortableProjects.length > 0 && (
+          <div className="flex flex-wrap items-center gap-3 text-xs text-zinc-500">
+            <span>Drag the handle to reorder projects.</span>
+            {(reordering || orderStatus) && (
+              <span className="text-zinc-300">
+                {reordering ? "Saving…" : orderStatus}
+              </span>
+            )}
+          </div>
+        )}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleProjectReorder}
+        >
+          <SortableContext
+            items={sortableIds}
+            strategy={verticalListSortingStrategy}
+          >
+            <div className="space-y-4">
+              {sortableProjects.map((project) => (
+                <SortableProjectCard
+                  key={project._id}
+                  project={project}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                  onFeature={handleFeature}
+                />
+              ))}
             </div>
-          ))}
-        </div>
+          </SortableContext>
+        </DndContext>
         {currentFeatured && (
           <p className="text-sm text-zinc-400">
             Currently featured: {currentFeatured.name}
@@ -359,6 +419,87 @@ export default function ProjectsPanel() {
         )}
       </div>
     </AdminShell>
+  );
+}
+
+type SortableProject = ProjectRecord & { _id: string };
+
+type SortableProjectCardProps = {
+  project: SortableProject;
+  onEdit: (project: ProjectRecord) => void;
+  onDelete: (id?: string) => void;
+  onFeature: (id?: string) => void;
+};
+
+function SortableProjectCard({
+  project,
+  onEdit,
+  onDelete,
+  onFeature,
+}: SortableProjectCardProps) {
+  const {
+    attributes,
+    listeners,
+    setActivatorNodeRef,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: project._id });
+
+  const style: CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`rounded-3xl border border-zinc-800 bg-zinc-900/30 p-5 ${
+        isDragging ? "ring-2 ring-purple-500/70" : ""
+      }`}
+    >
+      <div className="flex gap-3">
+        <button
+          type="button"
+          ref={setActivatorNodeRef}
+          {...attributes}
+          {...listeners}
+          className="mt-1 rounded-full border border-zinc-800 bg-zinc-900/70 p-2 text-zinc-500 transition hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
+          aria-label="Drag to reorder"
+        >
+          <GripVertical className="h-4 w-4" />
+        </button>
+        <div className="flex-1">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h3 className="text-lg font-semibold text-white">{project.name}</h3>
+              <p className="text-sm text-zinc-400">
+                {project.techStack?.join(", ") || "No stack"}
+              </p>
+            </div>
+            {project.featured && <StatusBadge label="Featured" tone="success" />}
+          </div>
+          <p className="mt-3 text-sm text-zinc-300 line-clamp-3">
+            {project.description}
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button size="sm" variant="secondary" onClick={() => onEdit(project)}>
+              Edit
+            </Button>
+            <ConfirmButton size="sm" onConfirm={() => onDelete(project._id)}>
+              Delete
+            </ConfirmButton>
+            {!project.featured && (
+              <Button size="sm" onClick={() => onFeature(project._id)}>
+                Mark featured
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 

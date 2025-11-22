@@ -4,10 +4,12 @@ import Project from "@/models/Project";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/auth.config";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     await connectDB();
-    const projects = await Project.find({}).sort({ createdAt: -1 });
+    const projects = await Project.find({}).sort({ order: 1, createdAt: -1 });
     return NextResponse.json(projects);
   } catch (error) {
     return NextResponse.json({ error: "Failed to fetch projects" }, { status: 500 });
@@ -21,7 +23,11 @@ export async function POST(req: Request) {
 
     const body = await req.json();
     await connectDB();
-    const newProject = await Project.create(body);
+    const payload = {
+      ...body,
+      order: Date.now(),
+    };
+    const newProject = await Project.create(payload);
     return NextResponse.json(newProject, { status: 201 });
   } catch (error) {
     return NextResponse.json({ error: "Failed to create project" }, { status: 500 });

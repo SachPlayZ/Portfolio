@@ -4,10 +4,12 @@ import Achievement from "@/models/Achievement";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/auth.config";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     await connectDB();
-    const achievements = await Achievement.find({}).sort({ createdAt: -1 });
+    const achievements = await Achievement.find({}).sort({ order: 1, createdAt: -1 });
     return NextResponse.json(achievements);
   } catch (error) {
     return NextResponse.json({ error: "Failed to fetch achievements" }, { status: 500 });
@@ -21,7 +23,11 @@ export async function POST(req: Request) {
 
     const body = await req.json();
     await connectDB();
-    const newAchievement = await Achievement.create(body);
+    const payload = {
+      ...body,
+      order: Date.now(),
+    };
+    const newAchievement = await Achievement.create(payload);
     return NextResponse.json(newAchievement, { status: 201 });
   } catch (error) {
     return NextResponse.json({ error: "Failed to create achievement" }, { status: 500 });
