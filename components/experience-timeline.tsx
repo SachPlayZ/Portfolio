@@ -23,7 +23,7 @@ const robotoCondensed = Roboto_Condensed({
 // Types
 interface Experience {
   _id: string;
-  orgName: string;
+  orgName?: string;
   orgIcon?: string;
   startDate: string;
   endDate?: string;
@@ -59,6 +59,12 @@ const parseMonthString = (value?: string, fallback = new Date()) => {
   const parsed = new Date(`${value}-01T00:00:00`);
   return Number.isNaN(parsed.getTime()) ? new Date(fallback) : parsed;
 };
+
+const getOrgDisplayName = (name?: string) =>
+  name?.trim() || "Untitled Organization";
+
+const getOrgInitials = (name?: string) =>
+  name?.trim()?.slice(0, 2)?.toUpperCase() || "NA";
 
 export const ExperienceTimeline = () => {
   const [experiences, setExperiences] = useState<Experience[]>([]);
@@ -321,6 +327,8 @@ export const ExperienceTimeline = () => {
 
               const isPrimarySide = index % 2 === 0;
               const accentColor = lineColors[exp._id] ?? DEFAULT_LINE_COLOR;
+              const displayName = getOrgDisplayName(exp.orgName);
+              const initials = getOrgInitials(exp.orgName);
 
               const markerBase =
                 "absolute z-30 w-4 h-4 rounded-full border-2 border-white shadow-md";
@@ -409,7 +417,7 @@ export const ExperienceTimeline = () => {
                         <div
                           className={`${instrumentSerif.className} text-2xl font-bold text-slate-800 whitespace-nowrap bg-white/80 backdrop-blur-sm px-4 py-2 rounded-xl shadow-sm border border-slate-100/50`}
                         >
-                          {exp.orgName}
+                          {displayName}
                         </div>
 
                         {/* Logo */}
@@ -417,13 +425,13 @@ export const ExperienceTimeline = () => {
                           {exp.orgIcon ? (
                             <Image
                               src={exp.orgIcon}
-                              alt={exp.orgName}
+                              alt={displayName}
                               fill
                               className="object-cover"
                             />
                           ) : (
                             <div className="w-full h-full bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-400">
-                              {exp.orgName.substring(0, 2)}
+                              {initials}
                             </div>
                           )}
                         </div>
@@ -453,6 +461,8 @@ export const ExperienceTimeline = () => {
           (() => {
             const exp = experiences.find((e) => e._id === expandedId);
             if (!exp) return null;
+            const displayName = getOrgDisplayName(exp.orgName);
+            const initials = getOrgInitials(exp.orgName);
             return (
               <motion.div
                 initial={{ opacity: 0 }}
@@ -493,13 +503,13 @@ export const ExperienceTimeline = () => {
                       {exp.orgIcon ? (
                         <Image
                           src={exp.orgIcon}
-                          alt={exp.orgName}
+                          alt={displayName}
                           fill
                           className="object-cover"
                         />
                       ) : (
                         <div className="w-full h-full bg-slate-100 flex items-center justify-center text-xl font-bold text-slate-400">
-                          {exp.orgName.substring(0, 2)}
+                          {initials}
                         </div>
                       )}
                     </div>
@@ -507,7 +517,7 @@ export const ExperienceTimeline = () => {
                     <h3
                       className={`${instrumentSerif.className} text-3xl font-bold text-slate-800 text-center mb-1`}
                     >
-                      {exp.orgName}
+                      {displayName}
                     </h3>
 
                     <div

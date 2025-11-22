@@ -92,7 +92,8 @@ export default function AchievementsSection() {
       if (!scrollContainerRef.current) return;
       setScrollWidth(scrollContainerRef.current.scrollWidth);
       const parentWidth =
-        scrollContainerRef.current.parentElement?.clientWidth ?? window.innerWidth;
+        scrollContainerRef.current.parentElement?.clientWidth ??
+        window.innerWidth;
       setViewportWidth(parentWidth);
     };
 
@@ -110,7 +111,8 @@ export default function AchievementsSection() {
       if (!scrollContainerRef.current) return;
       setScrollWidth(scrollContainerRef.current.scrollWidth);
       const parentWidth =
-        scrollContainerRef.current.parentElement?.clientWidth ?? window.innerWidth;
+        scrollContainerRef.current.parentElement?.clientWidth ??
+        window.innerWidth;
       setViewportWidth(parentWidth);
     });
     return () => cancelAnimationFrame(frame);

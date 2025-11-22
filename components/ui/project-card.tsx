@@ -17,11 +17,11 @@ const robotoCondensed = Roboto_Condensed({
 
 interface Project {
   _id: string;
-  name: string;
+  name?: string;
   logo?: string;
   overview?: string;
-  description: string;
-  images: string[];
+  description?: string;
+  images?: string[];
   demoVideoEmbed?: string;
   techStack?: string[];
   links?: { name: string; url: string }[];
@@ -49,6 +49,16 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
     return lastPart.split("?")[0];
   }, [demoVideoUrl]);
 
+  const projectName = project.name?.trim() || "Untitled Project";
+  const projectInitials = projectName.slice(0, 2).toUpperCase();
+  const truncatedDescription = project.description
+    ? project.description.slice(0, 100)
+    : "";
+  const overviewText =
+    project.overview?.trim() ||
+    truncatedDescription ||
+    "More details coming soon.";
+
   return (
     <motion.div
       className="h-[60vh] w-[23vw] min-w-[280px] bg-white/40 backdrop-blur-lg rounded-3xl shadow-[0_20px_80px_rgba(0,0,0,0.1)] flex flex-col p-6 gap-4 overflow-hidden border border-white/60 relative group shrink-0 mx-4 transition-colors duration-300"
@@ -67,13 +77,13 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
           {project.logo ? (
             <Image
               src={project.logo}
-              alt={`${project.name} logo`}
+              alt={`${projectName} logo`}
               fill
               className="object-cover"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-xs text-slate-400 font-bold">
-              {project.name.substring(0, 2).toUpperCase()}
+              {projectInitials}
             </div>
           )}
         </div>
@@ -107,7 +117,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
         className={`${instrumentSerif.className} text-4xl text-slate-800 text-center z-20 mt-2`}
         layoutId={`title-${project._id}`}
       >
-        {project.name}
+        {projectName}
       </motion.div>
 
       {/* Media Area */}
@@ -140,7 +150,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
               {project.images?.[0] ? (
                 <Image
                   src={project.images[0]}
-                  alt={project.name}
+                  alt={projectName}
                   fill
                   className="object-cover"
                 />
@@ -158,7 +168,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
       <div
         className={`${robotoCondensed.className} text-lg text-slate-600 line-clamp-3 text-center px-2 z-20 mt-auto mb-2 leading-relaxed`}
       >
-        {project.overview || project.description.substring(0, 100)}
+        {overviewText}
       </div>
     </motion.div>
   );
