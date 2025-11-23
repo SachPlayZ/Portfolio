@@ -61,30 +61,30 @@ export default function FeaturedProjectBox() {
   };
 
   return (
-    <div className="w-full h-full flex flex-col bg-white/40 backdrop-blur-lg border border-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-4xl p-8 relative overflow-hidden group hover:border-white/80 transition-colors text-slate-900">
-      <div className="absolute bottom-0 left-0 w-full h-1 bg-linear-to-r from-[#3ba58b] to-emerald-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+    <div className="w-full h-full flex flex-col bg-white/40 backdrop-blur-lg border border-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-3xl p-6 relative overflow-hidden group hover:border-white/80 transition-colors text-slate-900">
+      <div className="absolute bottom-0 left-0 w-full h-0.5 bg-linear-to-r from-[#3ba58b] to-emerald-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
 
-      <div className="flex justify-between items-start mb-4">
+      <div className="flex justify-between items-start mb-3">
         <div>
-          <p className="text-xs uppercase tracking-[0.4em] text-slate-500">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-slate-500">
             Spotlight
           </p>
-          <h3 className="text-2xl font-serif font-medium text-slate-800 group-hover:text-[#3ba58b] transition-colors">
+          <h3 className="text-xl font-serif font-medium text-slate-800 group-hover:text-[#3ba58b] transition-colors">
             Featured Project
           </h3>
         </div>
         <button
           type="button"
           onClick={handleOpenProject}
-          className="rounded-full border border-transparent p-2 text-slate-400 hover:text-[#3ba58b] hover:border-[#3ba58b]/30 transition-colors"
+          className="rounded-full border border-transparent p-1.5 text-slate-400 hover:text-[#3ba58b] hover:border-[#3ba58b]/30 transition-colors"
           aria-label="Open featured project details"
         >
-          <ArrowUpRight className="w-5 h-5" />
+          <ArrowUpRight className="w-4 h-4" />
         </button>
       </div>
 
-      <div className="flex-1 flex flex-col gap-5">
-        <div className="relative flex-1 rounded-3xl overflow-hidden border border-white/50 shadow-inner bg-slate-100">
+      <div className="flex-1 flex flex-col gap-4">
+        <div className="relative flex-1 rounded-2xl overflow-hidden border border-white/50 shadow-inner bg-slate-100">
           {loading ? (
             <div className="absolute inset-0 bg-white/60 animate-pulse" />
           ) : project && heroImage ? (
@@ -103,13 +103,11 @@ export default function FeaturedProjectBox() {
           )}
           <div className="absolute inset-0 bg-linear-to-t from-slate-900/60 via-transparent to-transparent pointer-events-none" />
           {project && (
-            <div className="absolute bottom-4 left-4 right-4 text-white">
-              <p className="text-sm uppercase tracking-[0.3em] text-white/70">
+            <div className="absolute bottom-3 left-3 right-3 text-white">
+              <p className="text-[10px] uppercase tracking-[0.25em] text-white/70">
                 Case Study
               </p>
-              <p className="text-2xl font-serif font-semibold">
-                {project.name}
-              </p>
+              <p className="text-xl font-serif font-semibold">{project.name}</p>
             </div>
           )}
         </div>
@@ -117,7 +115,7 @@ export default function FeaturedProjectBox() {
         <div>
           {project ? (
             <>
-              <p className="text-sm text-slate-600 line-clamp-3 leading-relaxed">
+              <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed">
                 {project.description}
               </p>
               {project.links?.[0] && (
@@ -125,17 +123,17 @@ export default function FeaturedProjectBox() {
                   href={project.links[0].url}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-[#3ba58b] mt-4"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#3ba58b] mt-3"
                 >
                   {project.links[0].name}
-                  <ArrowUpRight className="w-4 h-4" />
+                  <ArrowUpRight className="w-3.5 h-3.5" />
                 </a>
               )}
             </>
           ) : loading ? (
-            <p className="text-sm text-slate-500">Loading project…</p>
+            <p className="text-xs text-slate-500">Loading project…</p>
           ) : (
-            <p className="text-sm text-slate-500">
+            <p className="text-xs text-slate-500">
               {error ?? "No featured project selected."}
             </p>
           )}
