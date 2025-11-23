@@ -25,15 +25,15 @@ type SpotifyNowPayload = {
 };
 
 const LEFT_LINKS = [
-  { label: "Home", href: "/#home" },
-  { label: "About", href: "/#about" },
-  { label: "Projects", href: "/#projects" },
+  { label: "Home", href: "#home" },
+  { label: "About", href: "#about" },
+  { label: "Projects", href: "#projects" },
 ];
 
 const RIGHT_LINKS = [
-  { label: "Experience", href: "/#experience" },
-  { label: "Achievements", href: "/#achievements" },
-  { label: "Contact", href: "/#contact" },
+  { label: "Experience", href: "#experience" },
+  { label: "Achievements", href: "#achievements" },
+  { label: "Contact", href: "#contact" },
 ];
 
 const ALL_LINKS = [...LEFT_LINKS, ...RIGHT_LINKS];
@@ -53,6 +53,25 @@ const NavLinkBar = ({
   links: typeof LEFT_LINKS;
   visible: boolean;
 }) => {
+  const handleNavClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string
+  ) => {
+    e.preventDefault();
+    const targetId = href.replace("#", "");
+
+    // Special handling for home - scroll to top
+    if (targetId === "home") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    const element = document.getElementById(targetId);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
   return (
     <div
       className={cn(
@@ -63,7 +82,12 @@ const NavLinkBar = ({
       )}
     >
       {links.map((link) => (
-        <a key={link.label} href={link.href} className={navStyles}>
+        <a
+          key={link.label}
+          href={link.href}
+          onClick={(e) => handleNavClick(e, link.href)}
+          className={navStyles}
+        >
           {link.label}
         </a>
       ))}
@@ -71,15 +95,41 @@ const NavLinkBar = ({
   );
 };
 
-const MobileNavLinks = () => (
-  <div className="flex w-full max-w-sm flex-col gap-2 rounded-4xl border border-white/20 bg-white/70 p-4 text-center shadow-lg backdrop-blur-md">
-    {ALL_LINKS.map((link) => (
-      <a key={link.label} href={link.href} className={mobileNavStyles}>
-        {link.label}
-      </a>
-    ))}
-  </div>
-);
+const MobileNavLinks = () => {
+  const handleNavClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string
+  ) => {
+    e.preventDefault();
+    const targetId = href.replace("#", "");
+
+    // Special handling for home - scroll to top
+    if (targetId === "home") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    const element = document.getElementById(targetId);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  return (
+    <div className="flex w-full max-w-sm flex-col gap-2 rounded-4xl border border-white/20 bg-white/70 p-4 text-center shadow-lg backdrop-blur-md">
+      {ALL_LINKS.map((link) => (
+        <a
+          key={link.label}
+          href={link.href}
+          onClick={(e) => handleNavClick(e, link.href)}
+          className={mobileNavStyles}
+        >
+          {link.label}
+        </a>
+      ))}
+    </div>
+  );
+};
 
 // 2. SpotifyNotch Component (Center Piece)
 const SpotifyNotch = ({

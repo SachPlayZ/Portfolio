@@ -66,7 +66,7 @@ export default function GitHubActivity({
 
   return (
     <div className="w-full overflow-x-auto">
-      <div className="inline-block rounded-2xl border border-black/10 bg-white/70 p-4 shadow-inner backdrop-blur dark:border-white/10 dark:bg-white/5">
+      <div className="inline-block rounded-2xl  p-4">
         <GitHubCalendar
           username="SachPlayZ"
           colorScheme={currentTheme === "dark" ? "dark" : "light"}

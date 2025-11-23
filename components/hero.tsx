@@ -40,18 +40,18 @@ const Hero = () => {
   return (
     <main
       id="home"
-      className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-[#fdf5e7] px-6 py-12 text-slate-900"
+      className="relative flex min-h-screen w-full items-center justify-center overflow-x-hidden bg-[#fdf5e7] px-4 py-12 text-slate-900 sm:px-6"
     >
       <VoronoiBackground />
-      <section className="relative z-10 flex w-full max-w-14/16 flex-col gap-8 rounded-[3rem] border border-white/60 bg-white/40 p-8 shadow-[0_20px_80px_rgba(0,0,0,0.25)] backdrop-blur-lg md:flex-row md:items-stretch md:gap-14 md:p-15 min-h-[75vh]">
-        <div className="relative flex flex-1 flex-col text-balance">
+      <section className="relative z-10 flex w-full max-w-[93.75%] flex-col gap-6 rounded-[3rem] border border-white/60 bg-white/40 p-6 shadow-[0_20px_80px_rgba(0,0,0,0.25)] backdrop-blur-lg md:flex-row md:items-stretch md:gap-10 md:p-12 lg:gap-14 lg:p-15 min-h-[75vh] overflow-hidden">
+        <div className="relative flex flex-1 flex-col text-balance min-w-0">
           <div className="space-y-2">
             <div role="heading" aria-level={1}>
               <BlurText
                 text="Hi, I am Sachindra"
                 animateBy="words"
                 delay={225}
-                className={`${instrumentSerif.className} text-[clamp(2.75rem,6vw,5.5rem)] leading-tight text-zinc-600 [&>span:last-child]:text-[#3ba58b] [&>span:last-child]:italic`}
+                className={`${instrumentSerif.className} text-[clamp(2.5rem,5.5vw,5rem)] leading-tight text-zinc-600 [&>span:last-child]:text-[#3ba58b] [&>span:last-child]:italic`}
                 animationFrom={{ filter: "blur(12px)", opacity: 0, y: -60 }}
                 animationTo={[
                   { filter: "blur(6px)", opacity: 0.6, y: -10 },
@@ -60,7 +60,7 @@ const Hero = () => {
               />
             </div>
             <div
-              className={`${robotoCondensed.className} flex flex-wrap items-center gap-3 text-[clamp(1.4rem,2.5vw,2.1rem)] text-slate-600`}
+              className={`${robotoCondensed.className} flex flex-wrap items-center gap-3 text-[clamp(1.25rem,2.2vw,1.9rem)] text-slate-600`}
             >
               <div className="inline-flex items-center rounded-lg bg-[#3ba58b] px-2">
                 <RotatingText
@@ -86,7 +86,7 @@ const Hero = () => {
               <span>Engineer</span>
             </div>
             <p
-              className={`${robotoCondensed.className} mt-12 hidden text-[clamp(1.15rem,2vw,1.35rem)] leading-relaxed text-slate-700 md:block`}
+              className={`${robotoCondensed.className} mt-12 hidden text-[clamp(1rem,1.8vw,1.25rem)] leading-relaxed text-slate-700 md:block`}
             >
               I love building fast, scalable, and user-centric products while
               amplifying developer communities as a DevRel advocate. I&apos;ve
@@ -123,8 +123,8 @@ const Hero = () => {
           </div>
         </div>
 
-        <div className="flex flex-1 items-center justify-end">
-          <div className="relative w-full max-w-md aspect-7/9 overflow-hidden rounded-[2.5rem] shadow-2xl">
+        <div className="flex flex-1 items-center justify-end min-w-0">
+          <div className="relative w-full max-w-md aspect-7/9 overflow-hidden rounded-[2.5rem] shadow-2xl shrink-0">
             <img
               src={HERO_IMAGE}
               alt="Sachindra speaking at a conference"

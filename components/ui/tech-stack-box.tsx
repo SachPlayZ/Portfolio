@@ -136,65 +136,65 @@ export default function TechStackBox() {
     Array.from({ length: MAX_ITEMS_PER_CATEGORY }).map((_, index) => (
       <div
         key={`skeleton-${index}`}
-        className="h-16 rounded-3xl bg-white/60 animate-pulse"
+        className="h-14 rounded-2xl bg-white/60 animate-pulse"
       />
     ));
 
   return (
-    <div className="w-full h-full flex flex-col bg-white/40 backdrop-blur-lg border border-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-4xl p-8 relative overflow-hidden group hover:border-white/80 transition-colors text-slate-900">
-      <div className="absolute top-0 right-0 w-32 h-32 bg-[#3ba58b]/10 rounded-full blur-3xl -mr-16 -mt-16 transition-all group-hover:bg-[#3ba58b]/20" />
+    <div className="w-full h-full flex flex-col bg-white/40 backdrop-blur-lg border border-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-3xl p-6 relative overflow-hidden group hover:border-white/80 transition-colors text-slate-900">
+      <div className="absolute top-0 right-0 w-24 h-24 bg-[#3ba58b]/10 rounded-full blur-3xl -mr-12 -mt-12 transition-all group-hover:bg-[#3ba58b]/20" />
 
-      <p className="text-xs uppercase tracking-[0.4em] text-slate-500 mb-2 z-10">
+      <p className="text-[10px] uppercase tracking-[0.3em] text-slate-500 mb-1.5 z-10">
         Category
       </p>
       <div
-        className={`z-10 flex flex-col gap-6 transition-opacity duration-500 ${
+        className={`z-10 flex flex-col gap-4 transition-opacity duration-500 ${
           isTransitioning ? "opacity-0" : "opacity-100"
         }`}
       >
-        <div className="flex items-baseline justify-between gap-4">
-          <h3 className="text-3xl font-serif font-medium text-slate-800">
+        <div className="flex items-baseline justify-between gap-3">
+          <h3 className="text-2xl font-serif font-medium text-slate-800">
             {currentCategory.label}
           </h3>
-          <span className="text-[0.65rem] text-slate-500">
+          <span className="text-[0.6rem] text-slate-500">
             Hover to view proficiency
           </span>
         </div>
 
-        <div className="min-h-64">
+        <div className="min-h-48">
           {loading ? (
-            <div className="grid grid-cols-2 gap-3">{renderSkeleton()}</div>
+            <div className="grid grid-cols-2 gap-2">{renderSkeleton()}</div>
           ) : !hasAnyTech ? (
             <p className="text-sm text-slate-500">
               {error ?? "No tech stack records yet."}
             </p>
           ) : currentItems.length > 0 ? (
-            <div key={currentCategory.key} className="grid grid-cols-2 gap-3">
+            <div key={currentCategory.key} className="grid grid-cols-2 gap-2">
               {currentItems.map((tech) => (
                 <Tooltip key={tech._id ?? tech.name}>
                   <TooltipTrigger asChild>
-                    <div className="flex items-center gap-3 rounded-3xl border border-white/60 bg-white/70 px-3 py-3 shadow-[0_12px_30px_rgba(59,165,139,0.08)] hover:border-[#3ba58b]/40 transition-all cursor-default">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/80 border border-white/70 overflow-hidden">
+                    <div className="flex items-center gap-2 rounded-2xl border border-white/60 bg-white/70 px-2.5 py-2 shadow-[0_12px_30px_rgba(59,165,139,0.08)] hover:border-[#3ba58b]/40 transition-all cursor-default">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/80 border border-white/70 overflow-hidden">
                         {tech.image ? (
                           <Image
                             src={tech.image}
                             alt={tech.name}
-                            width={40}
-                            height={40}
-                            className="h-10 w-10 object-contain"
+                            width={32}
+                            height={32}
+                            className="h-8 w-8 object-contain"
                             unoptimized
                           />
                         ) : (
-                          <span className="text-sm font-semibold text-slate-500">
+                          <span className="text-xs font-semibold text-slate-500">
                             {tech.name.slice(0, 2).toUpperCase()}
                           </span>
                         )}
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-sm font-semibold text-slate-800">
+                        <span className="text-xs font-semibold text-slate-800">
                           {tech.name}
                         </span>
-                        <span className="text-xs text-slate-500">
+                        <span className="text-[10px] text-slate-500">
                           {currentCategory.label}
                         </span>
                       </div>

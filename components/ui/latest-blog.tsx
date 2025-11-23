@@ -22,19 +22,19 @@ const getContentPreview = (content?: string) => {
 const markdownComponents: Components = {
   p: (props: HTMLAttributes<HTMLParagraphElement>) => (
     <p
-      className="text-slate-500 text-sm leading-relaxed not-last:mb-2"
+      className="text-slate-500 text-sm leading-relaxed not-last:mb-2 break-words"
       {...props}
     />
   ),
   ul: (props: HTMLAttributes<HTMLUListElement>) => (
     <ul
-      className="list-disc pl-5 text-slate-500 text-sm leading-relaxed space-y-1"
+      className="list-disc pl-5 text-slate-500 text-sm leading-relaxed space-y-1 break-words"
       {...props}
     />
   ),
   ol: (props: HTMLAttributes<HTMLOListElement>) => (
     <ol
-      className="list-decimal pl-5 text-slate-500 text-sm leading-relaxed space-y-1"
+      className="list-decimal pl-5 text-slate-500 text-sm leading-relaxed space-y-1 break-words"
       {...props}
     />
   ),
@@ -123,35 +123,37 @@ export default function LatestBlog() {
   }
 
   return (
-    <div className="w-full h-full flex flex-col bg-white/40 backdrop-blur-lg border border-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-4xl p-8 hover:bg-white/50 transition-all duration-300 group relative overflow-hidden text-slate-900">
-      <div className="z-10 flex-1 flex flex-col">
-        <span className="self-start inline-block px-3 py-1 mb-6 text-xs font-medium text-[#3ba58b] bg-[#3ba58b]/10 rounded-full border border-[#3ba58b]/20">
+    <div className="w-full h-full flex flex-col bg-white/40 backdrop-blur-lg border border-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-3xl p-6 hover:bg-white/50 transition-all duration-300 group relative overflow-hidden text-slate-900 min-h-0">
+      <div className="z-10 flex-1 flex flex-col min-h-0">
+        <span className="self-start inline-block px-2.5 py-0.5 mb-4 text-[10px] font-medium text-[#3ba58b] bg-[#3ba58b]/10 rounded-full border border-[#3ba58b]/20">
           Latest Article
         </span>
-        <h3 className="text-3xl font-serif font-medium text-slate-800 mb-4 group-hover:text-[#3ba58b] transition-colors">
+        <h3 className="text-2xl font-serif font-medium text-slate-800 mb-3 group-hover:text-[#3ba58b] transition-colors">
           {blog.title}
         </h3>
-        <div className="space-y-4 flex-1 flex flex-col">
-          <p className="text-slate-600 line-clamp-4 leading-relaxed">
+        <div className="space-y-3 flex-1 flex flex-col min-h-0">
+          <p className="text-slate-600 line-clamp-4 leading-relaxed text-sm">
             {blog.description}
           </p>
           {contentPreview && (
-            <div className="flex-1 overflow-hidden rounded-3xl border border-white/50 bg-white/60 p-4">
-              <ReactMarkdown components={markdownComponents}>
-                {contentPreview}
-              </ReactMarkdown>
+            <div className="flex-1 overflow-hidden rounded-2xl border border-white/50 bg-white/60 p-3 min-h-0">
+              <div className="h-full overflow-y-auto">
+                <ReactMarkdown components={markdownComponents}>
+                  {contentPreview}
+                </ReactMarkdown>
+              </div>
             </div>
           )}
         </div>
       </div>
 
-      <div className="z-10 pt-6">
+      <div className="z-10 pt-4">
         <Button
           variant="ghost"
-          className="p-0 text-slate-800 hover:text-[#3ba58b] hover:bg-transparent group/btn text-base font-medium"
+          className="p-0 text-slate-800 hover:text-[#3ba58b] hover:bg-transparent group/btn text-sm font-medium"
         >
           Read Article{" "}
-          <ArrowRight className="ml-2 w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
+          <ArrowRight className="ml-2 w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
         </Button>
       </div>
     </div>

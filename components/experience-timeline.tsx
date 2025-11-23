@@ -211,7 +211,7 @@ export const ExperienceTimeline = () => {
       id="experience"
       className="min-h-screen w-full bg-[#fdf5e7] flex flex-col justify-start pt-20 pb-32 relative overflow-hidden"
     >
-      <div className="container mx-auto px-6 mb-32 z-10">
+      <div className="container mx-auto px-6 z-10">
         <h2
           className={`${instrumentSerif.className} text-5xl md:text-7xl font-normal text-slate-800 mb-4 tracking-tight`}
         >
@@ -241,8 +241,8 @@ export const ExperienceTimeline = () => {
           <div
             className={`absolute bg-slate-300 rounded-full z-0 ${
               isMobile
-                ? "top-0 bottom-0 left-1/2 -translate-x-1/2 w-1"
-                : "left-0 right-0 h-1"
+                ? "top-0 bottom-0 left-1/2 -translate-x-1/2 w-0.5"
+                : "left-0 right-0 h-0.5"
             }`}
           />
 
@@ -264,21 +264,21 @@ export const ExperienceTimeline = () => {
                 {/* Tick Mark */}
                 <div
                   className={`bg-slate-400 rounded-full transition-all duration-300 ${
-                    isMobile ? "w-4 h-1 mb-0" : "w-1 h-4 mb-2"
+                    isMobile ? "w-3 h-0.5 mb-0" : "w-0.5 h-3 mb-2"
                   }`}
                 />
                 {/* Label */}
                 <span
                   className={`${
                     robotoCondensed.className
-                  } text-xs text-slate-400 absolute whitespace-nowrap ${
+                  } text-[10px] text-slate-400 absolute whitespace-nowrap ${
                     isMobile
                       ? index % 2 === 0
-                        ? "translate-x-8"
-                        : "-translate-x-8"
+                        ? "translate-x-6"
+                        : "-translate-x-6"
                       : index % 2 === 0
-                      ? "translate-y-8"
-                      : "-translate-y-8"
+                      ? "translate-y-6"
+                      : "-translate-y-6"
                   }`}
                 >
                   {date.toLocaleDateString("en-US", {
@@ -331,7 +331,7 @@ export const ExperienceTimeline = () => {
               const initials = getOrgInitials(exp.orgName);
 
               const markerBase =
-                "absolute z-30 w-4 h-4 rounded-full border-2 border-white shadow-md";
+                "absolute z-30 w-3 h-3 rounded-full border-2 border-white shadow-md";
               const startMarkerClasses = isMobile
                 ? "top-0 left-1/2 -translate-x-1/2 -translate-y-1/2"
                 : "left-0 top-1/2 -translate-x-1/2 -translate-y-1/2";
@@ -344,8 +344,8 @@ export const ExperienceTimeline = () => {
                   key={exp._id}
                   className={`absolute z-20 group ${
                     isMobile
-                      ? "left-1/2 -translate-x-1/2 w-2"
-                      : "h-2 top-1/2 -translate-y-1/2"
+                      ? "left-1/2 -translate-x-1/2 w-1.5"
+                      : "h-1.5 top-1/2 -translate-y-1/2"
                   }`}
                   style={{
                     [isMobile ? "top" : "left"]: `${percentStart}%`,
@@ -380,12 +380,12 @@ export const ExperienceTimeline = () => {
 
                     {/* Floating Card - ALWAYS VISIBLE (opacity-100) */}
                     <motion.div
-                      className={`absolute flex items-center gap-3 w-max pointer-events-auto cursor-pointer z-30 ${
+                      className={`absolute flex items-center gap-2 w-max pointer-events-auto cursor-pointer z-30 ${
                         isMobile
                           ? isPrimarySide
-                            ? "right-8 flex-row"
-                            : "left-8 flex-row-reverse"
-                          : `flex-col ${isPrimarySide ? "bottom-20" : "top-20"}`
+                            ? "right-6 flex-row"
+                            : "left-6 flex-row-reverse"
+                          : `flex-col ${isPrimarySide ? "bottom-16" : "top-16"}`
                       }`}
                       initial={{
                         opacity: 0,
@@ -403,7 +403,7 @@ export const ExperienceTimeline = () => {
                     >
                       {/* Logo Group */}
                       <div
-                        className={`flex items-center gap-2 ${
+                        className={`flex items-center gap-1.5 ${
                           isMobile
                             ? isPrimarySide
                               ? "flex-row"
@@ -415,13 +415,13 @@ export const ExperienceTimeline = () => {
                       >
                         {/* Name */}
                         <div
-                          className={`${instrumentSerif.className} text-2xl font-bold text-slate-800 whitespace-nowrap bg-white/80 backdrop-blur-sm px-4 py-2 rounded-xl shadow-sm border border-slate-100/50`}
+                          className={`${instrumentSerif.className} text-xl font-bold text-slate-800 whitespace-nowrap bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-sm border border-slate-100/50`}
                         >
                           {displayName}
                         </div>
 
                         {/* Logo */}
-                        <div className="w-16 h-16 rounded-full bg-white border-4 border-white shadow-[0_4px_20px_rgba(0,0,0,0.1)] overflow-hidden relative z-30 hover:scale-110 transition-transform duration-300 shrink-0">
+                        <div className="w-12 h-12 rounded-full bg-white border-2 border-white shadow-[0_4px_20px_rgba(0,0,0,0.1)] overflow-hidden relative z-30 hover:scale-110 transition-transform duration-300 shrink-0">
                           {exp.orgIcon ? (
                             <Image
                               src={exp.orgIcon}

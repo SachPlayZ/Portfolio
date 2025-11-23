@@ -314,8 +314,8 @@ export const ProjectDirectory = () => {
         {/* Scrollable Container */}
         <div className="relative w-full flex-1 flex items-center">
           {/* Fade Masks */}
-          <div className="absolute left-0 top-0 bottom-0 w-32 bg-linear-to-r from-[#fdf5e7] via-[#fdf5e7]/80 to-transparent z-20 pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-0 w-32 bg-linear-to-l from-[#fdf5e7] via-[#fdf5e7]/80 to-transparent z-20 pointer-events-none" />
+          <div className="absolute left-0 top-0 bottom-0 w-16 md:w-32 bg-linear-to-r from-[#fdf5e7] via-[#fdf5e7]/50 md:via-[#fdf5e7]/80 to-transparent z-20 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-16 md:w-32 bg-linear-to-l from-[#fdf5e7] via-[#fdf5e7]/50 md:via-[#fdf5e7]/80 to-transparent z-20 pointer-events-none" />
 
           {/* Horizontal Scroll List */}
           <motion.div
@@ -359,14 +359,14 @@ export const ProjectDirectory = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-9999 flex items-center justify-center p-4 md:p-10 bg-slate-900/40 backdrop-blur-sm"
+            className="fixed inset-0 z-[80] flex items-center justify-center p-4 md:p-10 bg-slate-900/50 backdrop-blur-md"
             onClick={() => setSelectedProject(null)}
           >
             <motion.div
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
-              className="relative z-10000 bg-[#fdf5e7] border border-white/60 rounded-4xl w-full max-w-5xl lg:max-w-6xl max-h-[90vh] overflow-hidden flex flex-col shadow-[0_20px_80px_rgba(0,0,0,0.2)]"
+              className="relative z-[85] bg-[#fdf5e7] border border-white/60 rounded-4xl w-full max-w-5xl lg:max-w-6xl max-h-[90vh] overflow-hidden flex flex-col shadow-[0_20px_80px_rgba(0,0,0,0.2)]"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Modal Header */}

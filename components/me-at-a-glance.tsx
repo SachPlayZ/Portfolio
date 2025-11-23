@@ -44,16 +44,16 @@ export default function MeAtAGlance() {
   return (
     <section
       id="about"
-      className="min-h-screen w-full flex items-center justify-center p-6 md:p-12 bg-[#fdf5e7] relative overflow-hidden"
+      className="min-h-screen w-full flex items-center justify-center p-4 md:p-8 bg-[#fdf5e7] relative overflow-hidden"
     >
       <div className="w-full max-w-[90rem] mx-auto z-10">
-        <div className="mb-12 ml-4">
+        <div className="mb-8 ml-2">
           <h2
-            className={`${instrumentSerif.className} text-5xl md:text-7xl font-normal text-slate-800 mb-4 tracking-tight`}
+            className={`${instrumentSerif.className} text-4xl md:text-6xl font-normal text-slate-800 mb-3 tracking-tight`}
           >
             Me at a <span className="text-[#3ba58b] italic">Glance</span>
           </h2>
-          <p className="text-slate-600 text-lg md:text-xl max-w-2xl font-light">
+          <p className="text-slate-600 text-base md:text-lg max-w-2xl font-light">
             A live look into what I'm working on, thinking about, and
             contributing to.
           </p>
@@ -66,10 +66,10 @@ export default function MeAtAGlance() {
           viewport={{ once: true, margin: "-100px" }}
           className={cn(
             // 3 Columns Layout
-            "grid w-full grid-cols-1 gap-6 md:gap-8 md:grid-cols-3",
+            "grid w-full grid-cols-1 gap-4 md:gap-6 md:grid-cols-3",
             // 2 Rows total now
-            "md:grid-rows-[400px_300px]", // Explicit heights: Top row 400px, Bottom row 300px (GitHub)
-            "auto-rows-[minmax(240px,auto)]"
+            "md:grid-rows-[320px_240px]", // Explicit heights: Top row 320px, Bottom row 240px (GitHub)
+            "auto-rows-[minmax(200px,auto)]"
           )}
         >
           {/* Slot 1: Latest Blog (Left Col - Spans 1 col, 1 row) */}
